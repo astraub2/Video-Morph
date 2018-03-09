@@ -1,1 +1,0 @@
-config:x86:x86_32:generic:linux:gcc 5.4.0 (Ubuntu 5.4.0-6ubuntu1~16.04.9) 20160609:--enable-gpl --enable-libfaac --enable-libmp3lame --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libtheora --enable-libvorbis --enable-libx264 --enable-libxvid --enable-nonfree --enable-postproc --enable-version3 --enable-x11grab --enable-shared
