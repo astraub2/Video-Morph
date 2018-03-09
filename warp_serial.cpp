@@ -55,7 +55,7 @@ int main(int argc, char *argv[])
 
     VideoWriter outputVideo;                                        // Open the output
     
-    outputVideo.open(NAME, ex=0, inputVideo.get(CV_CAP_PROP_FPS), S, true);
+    outputVideo.open(NAME, ex=0, inputVideo.get(CV_CAP_PROP_FPS)*.5, S, true);
     
     if (!outputVideo.isOpened())
     {
