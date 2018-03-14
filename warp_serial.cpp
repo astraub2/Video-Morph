@@ -19,7 +19,7 @@ static void help()
         << "Usage:"                                                                         << endl
         << "./video-write inputvideoName <command>"                              << endl
         << "------------------------------------------------------------------------------" << endl
-         << "Available commands: invert" << endl
+        << "Available commands: invert, b&w, sepia" << endl
         << endl;
 }
 
@@ -33,8 +33,8 @@ int main(int argc, char *argv[])
         return -1;
     }
 
-    const string source      = argv[1];           // the source file name
-    const string Command=argv[2];
+    const string source  = argv[1];           // the source file name
+    const string Command = argv[2];
 
     VideoCapture inputVideo(source);              // Open input
     if (!inputVideo.isOpened())
@@ -47,14 +47,10 @@ int main(int argc, char *argv[])
     const string NAME = source.substr(0, pAt)+"_out.avi";   // Form the new name with container
     int ex;    // Get Codec Type- Int form
 
-    // Transform from int to char via Bitwise operators
-    // char EXT[] = {(char)(ex & 0XFF) , (char)((ex & 0XFF00) >> 8),(char)((ex & 0XFF0000) >> 16),(char)((ex & 0XFF000000) >> 24), 0};
-
     Size S = Size((int) inputVideo.get(CV_CAP_PROP_FRAME_WIDTH),    // Acquire input size
                   (int) inputVideo.get(CV_CAP_PROP_FRAME_HEIGHT));
 
     VideoWriter outputVideo;                                        // Open the output
-    
     outputVideo.open(NAME, ex=0, inputVideo.get(CV_CAP_PROP_FPS)*.5, S, true);
     
     if (!outputVideo.isOpened())
@@ -68,35 +64,55 @@ int main(int argc, char *argv[])
     
 
     if(Command=="invert"){
-        cout<<"Inverting...."<<endl;
-    for(;;) 
-        {
-        //cout<<"1st"<<endl;
-        Mat frame;
-        inputVideo >> frame; // get a new frame from camera
-        Mat cframe;
-        inputVideo >> cframe;
-        if (frame.empty()) break; 
-        //cout<<"2nd"<<endl;
 
+    	cout<<"Inverting...."<<endl;
+    	for(;;) 
+        	{
+	        Mat frame;
+	        inputVideo >> frame; // get a new frame from camera
+	        Mat cframe;
+	        inputVideo >> cframe;
+	        if (frame.empty()) break; 
 
-        uchar pixValue;
-        for (int i = 0; i < cframe.cols; i++) {
+	        uchar pixValue;
+	        for (int i = 0; i < cframe.cols; i++) {
             for (int j = 0; j < cframe.rows; j++) {
+	                Vec3b &intensity = frame.at<Vec3b>(j, i);
+	                Vec3b &inverse = cframe.at<Vec3b>(cframe.rows-j, cframe.cols-i);
+	                intensity.val[0] = inverse.val[0];
+	                intensity.val[1] = inverse.val[1];
+	                intensity.val[2] = inverse.val[2];
+	
+	             }
+	        }
+	       outputVideo.write(frame);
+	    }
+    
+    } else if (Command == "b&w"){
+	cout << "Black and Whiting..." << endl;
 
-                Vec3b &intensity = frame.at<Vec3b>(j, i);
-                //if(intensity.val[0]=0) break;
-                Vec3b &inverse = cframe.at<Vec3b>(cframe.rows-j, cframe.cols-i);
-                intensity.val[0] = inverse.val[0];
-                intensity.val[1] = inverse.val[1];
-                intensity.val[2] = inverse.val[2];
+	Mat frame;
+	Mat cframe;
+	Vec3b &intensity;
+	Vec3b &blackWhite;
+	uchar pixValue;
 
-             }
-        }
-       outputVideo.write(frame);
-       //cout<<"4"<<endl;
+	for(;;){
+		inputVideo >> frame;
+		inputVideo >> cframe;
+		if(frame.empty()) break;
+
+		for (int i = 0; i < cframe.cols; i++) {
+            for (int j = 0; j < cframe.rows; j++) {
+				&intensity = frame.at<Vec3b>(i, j);
+				&blackWhite = cframe.at<Vec3b>(cframe.rows-i, cframe.cols-j);
+	                	intensity.val[0] = inverse.val[0];
+		                intensity.val[1] = inverse.val[1];
+		                intensity.val[2] = inverse.val[2];
+			}
+		}	
+	}
     }
-}
 
     cout << "Finished writing" << endl;
     return 0;
