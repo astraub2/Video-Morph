@@ -71,16 +71,21 @@ int main(int argc, char *argv[])
         cout<<"Inverting...."<<endl;
     for(;;) 
         {
+        //cout<<"1st"<<endl;
         Mat frame;
         inputVideo >> frame; // get a new frame from camera
         Mat cframe;
         inputVideo >> cframe;
         if (frame.empty()) break; 
+        //cout<<"2nd"<<endl;
+
 
         uchar pixValue;
-        for (int i = 0; i < frame.cols; i++) {
-            for (int j = 0; j < frame.rows; j++) {
+        for (int i = 0; i < cframe.cols; i++) {
+            for (int j = 0; j < cframe.rows; j++) {
+
                 Vec3b &intensity = frame.at<Vec3b>(j, i);
+                //if(intensity.val[0]=0) break;
                 Vec3b &inverse = cframe.at<Vec3b>(cframe.rows-j, cframe.cols-i);
                 intensity.val[0] = inverse.val[0];
                 intensity.val[1] = inverse.val[1];
@@ -88,8 +93,8 @@ int main(int argc, char *argv[])
 
              }
         }
-
        outputVideo.write(frame);
+       //cout<<"4"<<endl;
     }
 }
 
