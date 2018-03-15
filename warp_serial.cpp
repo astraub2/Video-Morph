@@ -103,14 +103,16 @@ int main(int argc, char *argv[])
 		if(frame.empty()) break;
 
 		for (int i = 0; i < cframe.cols; i++) {
-            for (int j = 0; j < cframe.rows; j++) {
+  	        	for (int j = 0; j < cframe.rows; j++) {
 				&intensity = frame.at<Vec3b>(i, j);
-				&blackWhite = cframe.at<Vec3b>(cframe.rows-i, cframe.cols-j);
-	                	intensity.val[0] = inverse.val[0];
-		                intensity.val[1] = inverse.val[1];
-		                intensity.val[2] = inverse.val[2];
+				&blackWhite = cframe.at<Vec3b>(i, j);
+	                	
+				intensity.val[0] = 0;
+		                intensity.val[1] = 0;
+		                intensity.val[2] = blackWhite.val[2];
 			}
 		}	
+	       outputVideo.write(frame);
 	}
     }
 
