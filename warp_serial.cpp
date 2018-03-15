@@ -19,7 +19,9 @@ static void help()
         << "Usage:"                                                                         << endl
         << "./video-write inputvideoName <command>"                              << endl
         << "------------------------------------------------------------------------------" << endl
-        << "Available commands: invert, b&w, sepia" << endl
+        << "Available commands: invert, b&w, sepia, watermark" << endl
+        << "./video-write inputvideoName <command> watermarkimage"                              << endl
+
         << endl;
 }
 
@@ -27,7 +29,7 @@ int main(int argc, char *argv[])
 {
     help();
 
-    if (argc != 3)
+    if (argc < 3)
     {
         cout << "Not enough parameters" << endl;
         return -1;
@@ -35,6 +37,12 @@ int main(int argc, char *argv[])
 
     const string source  = argv[1];           // the source file name
     const string Command = argv[2];
+
+    string watermark_img_file;
+    if (argc == 4) 
+    {
+        watermark_img_file = argv[3];          //watermark image file name
+    }
 
     VideoCapture inputVideo(source);              // Open input
     if (!inputVideo.isOpened())
@@ -114,8 +122,34 @@ int main(int argc, char *argv[])
 		}	
 	       outputVideo.write(frame);
 	}
+    } else if (Command == "watermark") {
+
+        cout<<"Adding watermark..."<<endl;
+        Mat wframe = imread(watermark_img_file);
+        double opacity = .25;
+        int offset = 100;
+        for(;;){
+            Mat frame;
+            inputVideo >> frame; // get a new frame from camera
+            
+            if (frame.empty()) break; 
+
+            for (int i = 0; i < wframe.rows; i++) {
+                for (int j = 0; j < wframe.cols; j++) {
+                    Vec3b &intensity = frame.at<Vec3b>(i+offset, j+offset);
+                    Vec3b &watermark = wframe.at<Vec3b>(i, j);
+                    intensity.val[0] = watermark.val[0]*opacity + intensity.val[0]*(1-opacity);
+                    intensity.val[1] = watermark.val[1]*opacity + intensity.val[1]*(1-opacity);
+                    intensity.val[2] = watermark.val[2]*opacity + intensity.val[2]*(1-opacity);
+        
+                }
+            }
+           outputVideo.write(frame);
+        }
     }
 
+    inputVideo.release();
+    outputVideo.release();
     cout << "Finished writing" << endl;
     return 0;
 }
