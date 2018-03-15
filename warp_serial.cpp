@@ -19,7 +19,7 @@ static void help()
         << "Usage:"                                                                         << endl
         << "./video-write inputvideoName <command>"                              << endl
         << "------------------------------------------------------------------------------" << endl
-        << "Available commands: invert, bw, sepia, watermark" << endl
+        << "Available commands: invert, bw, sepia, watermark, darken, self_overlay" << endl
         << "./video-write inputvideoName <command> watermarkimage"                              << endl
 
         << endl;
@@ -101,8 +101,7 @@ int main(int argc, char *argv[])
 
 	Mat frame;
 	Mat cframe;
-	Vec3b &intensity;
-	Vec3b &blackWhite;
+	
 	uchar pixValue;
 	float rconst = 0.2125;
 	float gconst = 0.7154;
@@ -115,8 +114,8 @@ int main(int argc, char *argv[])
 
 		for (int i = 0; i < cframe.cols; i++) {
   	        	for (int j = 0; j < cframe.rows; j++) {
-				&intensity = frame.at<Vec3b>(i, j);
-				
+				Vec3b &intensity = frame.at<Vec3b>(j, i);
+                Vec3b &inverse = cframe.at<Vec3b>(j, i);
 				// Change each color value to black and white
 				intensity.val[0] = (int)(rconst * intensity.val[0]);
 				intensity.val[1] = (int)(gconst * intensity.val[1]);
@@ -148,6 +147,70 @@ int main(int argc, char *argv[])
         
                 }
             }
+           outputVideo.write(frame);
+        }
+    }
+    if(Command=="darken"){
+
+        cout<<"Darkening...."<<endl;
+        #pragma omp parallel for
+        for(;;) 
+            {
+            Mat frame;
+            inputVideo >> frame; // get a new frame from camera
+            Mat cframe;
+            inputVideo >> cframe;
+            if (frame.empty()) break; 
+
+            #pragma omp parallel for
+            for (int i = 0; i < cframe.cols; i++) {
+            for (int j = 0; j < cframe.rows; j++) {
+                    Vec3b &intensity = frame.at<Vec3b>(j, i);
+                    Vec3b &inverse = cframe.at<Vec3b>(j, i);
+                    intensity.val[0] = inverse.val[0]>>1;
+                    intensity.val[1] = inverse.val[1]>>1;
+                    intensity.val[2] = inverse.val[2]>>1;
+    
+                 }
+            }
+           outputVideo.write(frame);
+        }
+    }
+    if(Command=="self_overlay"){
+
+        cout<<"Overlaying...."<<endl;
+        #pragma omp parallel for
+        for(;;) 
+            {
+            Mat frame;
+            inputVideo >> frame; // get a new frame from camera
+            Mat cframe;
+            inputVideo >> cframe;
+            if (frame.empty()) break; 
+
+            #pragma omp parallel for
+            for (int i = 0; i < cframe.cols; i+=2) {
+            for (int j = 0; j < cframe.rows; j+=2) {
+                  Vec3b &intensity = frame.at<Vec3b>(j, i);
+                    Vec3b &inverse = cframe.at<Vec3b>(cframe.rows-j, cframe.cols-i);
+                    intensity.val[0] = inverse.val[0];
+                    intensity.val[1] = inverse.val[1];
+                    intensity.val[2] = inverse.val[2];
+    
+                 }
+            }
+            #pragma omp parallel for
+            for (int i = 1; i < cframe.cols; i+=2) {
+            for (int j = 1; j < cframe.rows; j+=2) {
+                  Vec3b &intensity = frame.at<Vec3b>(j, i);
+                    Vec3b &inverse = cframe.at<Vec3b>(cframe.rows-j, cframe.cols-i);
+                    intensity.val[0] = inverse.val[0];
+                    intensity.val[1] = inverse.val[1];
+                    intensity.val[2] = inverse.val[2];
+    
+                 }
+            }
+            
            outputVideo.write(frame);
         }
     }
