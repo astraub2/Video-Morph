@@ -19,7 +19,7 @@ static void help()
         << "Usage:"                                                                         << endl
         << "./video-write inputvideoName <command>"                              << endl
         << "------------------------------------------------------------------------------" << endl
-        << "Available commands: invert, b&w, sepia, watermark" << endl
+        << "Available commands: invert, bw, sepia, watermark" << endl
         << "./video-write inputvideoName <command> watermarkimage"                              << endl
 
         << endl;
@@ -96,7 +96,7 @@ int main(int argc, char *argv[])
 	       outputVideo.write(frame);
 	    }
     
-    } else if (Command == "b&w"){
+    } else if (Command == "bw"){
 	cout << "Black and Whiting..." << endl;
 
 	Mat frame;
@@ -104,6 +104,9 @@ int main(int argc, char *argv[])
 	Vec3b &intensity;
 	Vec3b &blackWhite;
 	uchar pixValue;
+	float rconst = 0.2125;
+	float gconst = 0.7154;
+	float bconst = 0.0721;
 
 	for(;;){
 		inputVideo >> frame;
@@ -113,15 +116,16 @@ int main(int argc, char *argv[])
 		for (int i = 0; i < cframe.cols; i++) {
   	        	for (int j = 0; j < cframe.rows; j++) {
 				&intensity = frame.at<Vec3b>(i, j);
-				&blackWhite = cframe.at<Vec3b>(i, j);
-	                	
-				intensity.val[0] = 0;
-		                intensity.val[1] = 0;
-		                intensity.val[2] = blackWhite.val[2];
+				
+				// Change each color value to black and white
+				intensity.val[0] = (int)(rconst * intensity.val[0]);
+				intensity.val[1] = (int)(gconst * intensity.val[1]);
+				intensity.val[2] = (int)(bconst * intensity.val[2]);
 			}
 		}	
 	       outputVideo.write(frame);
 	}
+
     } else if (Command == "watermark") {
 
         cout<<"Adding watermark..."<<endl;
