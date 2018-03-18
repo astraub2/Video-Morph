@@ -124,10 +124,10 @@ int main(int argc, char *argv[])
             		for (int j = 0; j < cframe.rows; j=j+2) {
 				GaussianBlur(cframe, frame, Size(i,i), 0, 0);	
 */
-	             }
-	        }
+	             
+	        
 	       outputVideo.write(frame);
-	    }
+	       }
 
    } else if (Command == "bw"){
 	cout << "Black and Whiting..." << endl;
