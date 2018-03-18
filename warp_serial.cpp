@@ -101,12 +101,12 @@ int main(int argc, char *argv[])
     else if(Command=="blur"){
 
     	cout<<"Blurry...."<<endl;
+    	Mat frame;
+		Mat copyFrame;
     	for(;;) 
         	{
-	        Mat frame;
-	        inputVideo >> frame; // get a new frame from camera
-	        Mat cframe;
-	        inputVideo >> cframe;
+	        inputVideo >> frame;
+			copyFrame = frame;
 	        if (frame.empty()) break; 
 
 	        uchar pixValue;
@@ -114,12 +114,6 @@ int main(int argc, char *argv[])
 			for ( int i = 1; i < 31; i = i + 2 ) {
 				GaussianBlur( cframe, frame, Size( i, i ), 0, 0 );
 			}
-/*
-
-	        for (int i = 0; i < cframe.cols; i=i+2) {
-            		for (int j = 0; j < cframe.rows; j=j+2) {
-				GaussianBlur(cframe, frame, Size(i,i), 0, 0);	
-*/
 
 	       outputVideo.write(frame);
 	    }
@@ -153,18 +147,41 @@ int main(int argc, char *argv[])
 	        outputVideo.write(copyFrame);
 	}
 
-   } else if (Command == "sepia"){
+   } else if (Command == "negative"){
+	cout << "Negative..." << endl;
+	Mat frame;
+	Mat copyFrame;
+	uchar pixValue;
+
+	for(;;){
+		inputVideo >> frame;
+		copyFrame = frame;
+		if(frame.empty()) break;
+		for (int i = 0; i < frame.rows; i++) {
+	        	for (int j = 0; j < frame.cols; j++) {
+    	    		Vec3b &inputPixel = frame.at<Vec3b>(i, j);
+        	        Vec3b &outputPixel = copyFrame.at<Vec3b>(i, j);
+				
+					outputPixel.val[0] = 255 - inputPixel.val[0];
+					outputPixel.val[1] = 255 - inputPixel.val[1];
+					outputPixel.val[2] = 255 - inputPixel.val[2];
+            	}
+		}	
+	        outputVideo.write(copyFrame);
+	}
+
+	} else if (Command == "sepia"){
 	cout << "Sepia..." << endl;
 	Mat frame;
 	Mat copyFrame;
 	uchar pixValue;
 
-	double tr;
-	double tg;
-	double tb;
-	char r;
-	char g;
-	char b;
+	int tr;
+	int tg;
+	int tb;
+	int r;
+	int g;
+	int b;
 
 	for(;;){
 		inputVideo >> frame;
@@ -176,15 +193,15 @@ int main(int argc, char *argv[])
 	        	        Vec3b &out = copyFrame.at<Vec3b>(i, j);
 	                
     				//Create sepia values
-				tr = (0.393 * in.val[0]) +
-				     (0.769 * in.val[1]) +
-				     (0.189 * in.val[2]);
-				tg = (0.349 * in.val[0]) +
-				     (0.686 * in.val[1]) +
-				     (0.168 * in.val[2]);
-				tb = (0.272 * in.val[0]) +
-				     (0.534 * in.val[1]) +
-				     (0.131 * in.val[2]);
+				tr = (int) (0.393 * in.val[0]) +
+				     	   (0.769 * in.val[1]) +
+				     	   (0.189 * in.val[2]);
+				tg = (int) (0.349 * in.val[0]) +
+				       	   (0.686 * in.val[1]) +
+				     	   (0.168 * in.val[2]);
+				tb = (int) (0.272 * in.val[0]) +
+				           (0.534 * in.val[1]) +
+				    	   (0.131 * in.val[2]);
 
 				// If they are over max value, set to max
 				if(tr > 255){ r = 255; } else { r = tr; }	
