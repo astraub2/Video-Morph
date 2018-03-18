@@ -159,16 +159,13 @@ int main(int argc, char *argv[])
 		if(frame.empty()) break;
 		for (int i = 0; i < frame.rows; i++) {
 	        	for (int j = 0; j < frame.cols; j++) {
-        	    		Vec3b &inputPixel = frame.at<Vec3b>(i, j);
-	        	        Vec3b &outputPixel = copyFrame.at<Vec3b>(i, j);
-	                
-    				//Create luminosity value
-	    			luminosity = (rconst * inputPixel.val[0] + gconst * inputPixel.val[1] + bconst * inputPixel.val[2]);
+    	    		Vec3b &inputPixel = frame.at<Vec3b>(i, j);
+        	        Vec3b &outputPixel = copyFrame.at<Vec3b>(i, j);
 				
-				outputPixel.val[0] = luminosity;
-				outputPixel.val[1] = luminosity;
-				outputPixel.val[2] = luminosity;
-            		}
+					outputPixel.val[0] = 255 - inputPixel.val[0];
+					outputPixel.val[1] = 255 - inputPixel.val[1];
+					outputPixel.val[2] = 255 - inputPixel.val[2];
+            	}
 		}	
 	        outputVideo.write(copyFrame);
 	}
