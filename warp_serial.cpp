@@ -191,9 +191,9 @@ int main(int argc, char *argv[])
 				if(tg > 255){ g = 255; } else { g = tg; }	
 				if(tb > 255){ b = 255; } else { b = tb; }	
 
-				outputPixel.val[0] = r;
-				outputPixel.val[1] = g;
-				outputPixel.val[2] = b;
+				out.val[0] = r;
+				out.val[1] = g;
+				out.val[2] = b;
             		}
 		}	
 	        outputVideo.write(copyFrame);
@@ -291,20 +291,21 @@ int main(int argc, char *argv[])
 	inputVideo >> frame;
 	if (frame.empty()) break;
 
-        Mat cframe(frame.rows, frame.cols);
+
+        Mat cframe(frame.rows, frame.cols, frame.type());
         
-	Mat newframe(frame.rows, frame.cols); //new frame same size as original
+	Mat newframe(frame.rows, frame.cols, frame.type()); //new frame same size as original
         int halfrow = frame.rows/2;
 	int halfcol = frame.cols/2; 
-        Mat q1(halfrow, halfcol);
-        Mat q2(halfrow, halfcol);
-        Mat q3(halfrow, halfcol);
-        Mat q4(halfrow, halfcol);
+        Mat q1(halfrow, halfcol, frame.type());
+        Mat q2(halfrow, halfcol, frame.type());
+        Mat q3(halfrow, halfcol, frame.type());
+        Mat q4(halfrow, halfcol, frame.type());
 
-	resize(frame, q1, q1.size(), 0, 0, interpolation);
-	resize(frame, q2, q2.size(), 0, 0, interpolation);
-	resize(frame, q3, q3.size(), 0, 0, interpolation);
-	resize(frame, q4, dst.size(), 0, 0, interpolation);
+	resize(frame, q1, q1.size(), 0, 0, INTER_AREA);
+	resize(frame, q2, q2.size(), 0, 0, INTER_AREA);
+	resize(frame, q3, q3.size(), 0, 0, INTER_AREA);
+	resize(frame, q4, q4.size(), 0, 0, INTER_AREA);
  	
 	int offset = 32;	
 
