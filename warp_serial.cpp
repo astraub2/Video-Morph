@@ -160,6 +160,32 @@ int main(int argc, char *argv[])
 	        outputVideo.write(copyFrame);
 	}
 
+   } else if (Command == "sepia"){
+	cout << "Sepia..." << endl;
+	Mat frame;
+	Mat copyFrame;
+	uchar pixValue;
+
+	for(;;){
+		inputVideo >> frame;
+		copyFrame = frame;
+		if(frame.empty()) break;
+		for (int i = 0; i < frame.rows; i++) {
+	        	for (int j = 0; j < frame.cols; j++) {
+        	    		Vec3b &inputPixel = frame.at<Vec3b>(i, j);
+	        	        Vec3b &outputPixel = copyFrame.at<Vec3b>(i, j);
+	                
+    				//Create luminosity value
+	    			luminosity = (rconst * inputPixel.val[0] + gconst * inputPixel.val[1] + bconst * inputPixel.val[2]);
+				
+				outputPixel.val[0] = luminosity;
+				outputPixel.val[1] = luminosity;
+				outputPixel.val[2] = luminosity;
+            		}
+		}	
+	        outputVideo.write(copyFrame);
+	}
+
     } else if (Command == "watermark") {
 
         cout<<"Adding watermark..."<<endl;
