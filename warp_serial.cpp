@@ -96,7 +96,9 @@ int main(int argc, char *argv[])
 	       outputVideo.write(frame);
 	    }
     
-    } if(Command=="blur"){
+    } 
+    
+    else if(Command=="blur"){
 
     	cout<<"Blurry...."<<endl;
     	for(;;) 
@@ -172,7 +174,7 @@ int main(int argc, char *argv[])
            outputVideo.write(frame);
         }
     }
-    if(Command=="darken"){
+    else if(Command=="darken"){
 
         cout<<"Darkening...."<<endl;
         for(;;) 
@@ -196,7 +198,7 @@ int main(int argc, char *argv[])
            outputVideo.write(frame);
         }
     }
-    if(Command=="self_overlay"){
+    else if(Command=="self_overlay"){
 
         cout<<"Overlaying...."<<endl;
         for(;;) 
@@ -231,6 +233,36 @@ int main(int argc, char *argv[])
            outputVideo.write(frame);
         }
     }
+    else if(Command == "andy"){
+    
+        cout << "Making art...." << endl;
+	for(;;){
+        Mat frame;
+	inputVideo >> frame;
+	if (frame.empty()) break;
+
+        Mat cframe(frame.rows, frame.cols);
+        
+	Mat newframe(frame.rows, frame.cols); //new frame same size as original
+        int halfrow = frame.rows/2;
+	int halfcol = frame.cols/2; 
+        Mat q1(halfrow, halfcol);
+        Mat q2(halfrow, halfcol);
+        Mat q3(halfrow, halfcol);
+        Mat q4(halfrow, halfcol);
+
+	resize(frame, q1, q1.size(), 0, 0, interpolation);
+	resize(frame, q2, q2.size(), 0, 0, interpolation);
+	resize(frame, q3, q3.size(), 0, 0, interpolation);
+	resize(frame, q4, dst.size(), 0, 0, interpolation);
+	
+        for(int i = 0; i < halfrow; i++){
+	    for(int j = 0; j < halfcol; j++){	
+		Vec3b &q1color = q1.at<Vec3b>(j,i);
+		Vec3b &q2color = q2.at<Vec3b>(j,i);
+		Vec3b &q3color = q3.at<Vec3b>(j,i);
+		Vec3b &q4color = q4.at<Vec3b>(j,i);
+    }	
 
     inputVideo.release();
     outputVideo.release();
