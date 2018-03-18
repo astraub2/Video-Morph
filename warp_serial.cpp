@@ -159,12 +159,12 @@ int main(int argc, char *argv[])
 	Mat copyFrame;
 	uchar pixValue;
 
-	double tr;
-	double tg;
-	double tb;
-	char r;
-	char g;
-	char b;
+	int tr;
+	int tg;
+	int tb;
+	int r;
+	int g;
+	int b;
 
 	for(;;){
 		inputVideo >> frame;
@@ -176,24 +176,24 @@ int main(int argc, char *argv[])
 	        	        Vec3b &out = copyFrame.at<Vec3b>(i, j);
 	                
     				//Create sepia values
-				tr = (0.393 * in.val[0]) +
-				     (0.769 * in.val[1]) +
-				     (0.189 * in.val[2]);
-				tg = (0.349 * in.val[0]) +
-				     (0.686 * in.val[1]) +
-				     (0.168 * in.val[2]);
-				tb = (0.272 * in.val[0]) +
-				     (0.534 * in.val[1]) +
-				     (0.131 * in.val[2]);
+				tr = (int) (0.393 * in.val[0]) +
+				     	   (0.769 * in.val[1]) +
+				     	   (0.189 * in.val[2]);
+				tg = (int) (0.349 * in.val[0]) +
+				       	   (0.686 * in.val[1]) +
+				     	   (0.168 * in.val[2]);
+				tb = (int) (0.272 * in.val[0]) +
+				           (0.534 * in.val[1]) +
+				    	   (0.131 * in.val[2]);
 
 				// If they are over max value, set to max
 				if(tr > 255){ r = 255; } else { r = tr; }	
 				if(tg > 255){ g = 255; } else { g = tg; }	
 				if(tb > 255){ b = 255; } else { b = tb; }	
 
-				outputPixel.val[0] = r;
-				outputPixel.val[1] = g;
-				outputPixel.val[2] = b;
+				out.val[0] = r;
+				out.val[1] = g;
+				out.val[2] = b;
             		}
 		}	
 	        outputVideo.write(copyFrame);
