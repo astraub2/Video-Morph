@@ -126,6 +126,7 @@ int main(int argc, char *argv[])
 	float rconst = 0.2125;
 	float gconst = 0.7154;
 	float bconst = 0.0721;
+	double luminosity;
 
 	for(;;){
 		inputVideo >> frame;
@@ -134,17 +135,21 @@ int main(int argc, char *argv[])
 		if(frame.empty()) break;
 
 		for (int i = 0; i < frame.rows; i++) {
-	        for (int j = 0; j < frame.cols; j++) {
-            	Vec3b &inputPixel = frame.at<Vec3b>(i, j);
-                Vec3b &outputPixel = copyFrame.at<Vec3b>(i, j);
+	        	for (int j = 0; j < frame.cols; j++) {
+        	    		Vec3b &inputPixel = frame.at<Vec3b>(i, j);
+	        	        Vec3b &outputPixel = copyFrame.at<Vec3b>(i, j);
 	                
-    			//change colors using constants
-    			outputPixel.val[0] = rconst * inputPixel.val[0];
-    			outputPixel.val[1] = gconst * inputPixel.val[1];
-    			outputPixel.val[2] = bconst * inputPixel.val[2];
-            }
+    				//change colors using constants
+	    			luminosity = rconst * inputPixel.val[0] +
+					     gconst * inputPixel.val[1] +
+					     gconst * inputPixel.val[2];
+
+				outputPixel.val[0] = luminosity;
+				outputPixel.val[1] = luminosity;
+				outputPixel.val[2] = luminosity;
+            		}
 		}	
-	       outputVideo.write(copyFrame);
+	        outputVideo.write(copyFrame);
 	}
 
     } else if (Command == "watermark") {
