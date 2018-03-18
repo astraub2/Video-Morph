@@ -326,8 +326,8 @@ int main(int argc, char *argv[])
  	
 	int offset = 32;	
 
-        for(int i = 0; i < halfrow; i++){
-	    for(int j = 0; j < halfcol; j++){	
+        for(int i = 0; i < q1.rows; i++){
+	    for(int j = 0; j < q1.cols; j++){	
 		Vec3b &q1color = q1.at<Vec3b>(j,i);
 		Vec3b &q2color = q2.at<Vec3b>(j,i);
 		Vec3b &q3color = q3.at<Vec3b>(j,i);
@@ -347,8 +347,8 @@ int main(int argc, char *argv[])
 		q4color.val[2] += (offset*4);
 	    }
 	}
-	for(int i = 0; i < halfrow; i++){
-	    for(int j = 0; j < halfcol; j++){
+	for(int i = 0; i < q1.rows; i++){
+	    for(int j = 0; j < q1.cols; j++){
 		Vec3b &newframecolor = newframe.at<Vec3b>(j,i);
 		Vec3b &q1color = q1.at<Vec3b>(j, i);
 		newframecolor.val[0] = q1color.val[0];
@@ -356,8 +356,8 @@ int main(int argc, char *argv[])
 		newframecolor.val[2] = q1color.val[2];
 	    }
 	}
-	for(int i = halfrow; i < (halfrow*2); i++){
-	    for(int j = 0; j < halfcol; j++){
+	for(int i = halfrow; i < frame.rows; i++){
+	    for(int j = 0; j < q2.cols; j++){
 		Vec3b &newframecolor = newframe.at<Vec3b>(j,i);
 		Vec3b &q2color = q2.at<Vec3b>(j, i);
 		newframecolor.val[0] = q2color.val[0];
@@ -365,8 +365,8 @@ int main(int argc, char *argv[])
 		newframecolor.val[2] = q2color.val[2];
 	    }
 	}
-	for(int i = 0; i < halfrow; i++){
-	    for(int j = halfcol; j < (halfcol*2); j++){
+	for(int i = 0; i < q3.rows; i++){
+	    for(int j = halfcol; j < frame.cols; j++){
 		Vec3b &newframecolor = newframe.at<Vec3b>(j,i);
 		Vec3b &q3color = q3.at<Vec3b>(j, i);
 		newframecolor.val[0] = q3color.val[0];
@@ -374,8 +374,8 @@ int main(int argc, char *argv[])
 		newframecolor.val[2] = q3color.val[2];
 	    }
 	}
-	for(int i = halfrow; i < (halfrow*2); i++){
-	    for(int j = halfcol; j < (halfcol*2); j++){
+	for(int i = halfrow; i < frame.rows; i++){
+	    for(int j = halfcol; j < frame.cols; j++){
 		Vec3b &newframecolor = newframe.at<Vec3b>(j,i);
 		Vec3b &q4color = q4.at<Vec3b>(j, i);
 		newframecolor.val[0] = q4color.val[0];
