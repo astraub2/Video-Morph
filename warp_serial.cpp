@@ -20,7 +20,7 @@ static void help()
         << "./video-write inputvideoName <command>"                              << endl
         << "------------------------------------------------------------------------------" << endl
         << "Available commands: invert, bw, sepia, watermark, darken, self_overlay" << endl
-        << "./video-write inputvideoName <command> watermarkimage"                              << endl
+        << "./video-write inputvideoName <command> <watermark image file name>"                              << endl
 
         << endl;
 }
@@ -84,14 +84,14 @@ int main(int argc, char *argv[])
 
 	        uchar pixValue;
 	        for (int i = 0; i < cframe.cols; i++) {
-            for (int j = 0; j < cframe.rows; j++) {
+                for (int j = 0; j < cframe.rows; j++) {
 	                Vec3b &intensity = frame.at<Vec3b>(j, i);
 	                Vec3b &inverse = cframe.at<Vec3b>(cframe.rows-j, cframe.cols-i);
 	                intensity.val[0] = inverse.val[0];
 	                intensity.val[1] = inverse.val[1];
 	                intensity.val[2] = inverse.val[2];
 	
-	             }
+	           }
 	        }
 	       outputVideo.write(frame);
 	    }
@@ -109,9 +109,9 @@ int main(int argc, char *argv[])
 
 	        uchar pixValue;
 	        for (int i = 0; i < cframe.cols; i=i+2) {
-            		for (int j = 0; j < cframe.rows; j=j+2) {
-				GaussianBlur(cframe, frame, Size(i,j), 0, 0);	
-	             }
+            	for (int j = 0; j < cframe.rows; j=j+2) {
+				    GaussianBlur(cframe, frame, Size(i,j), 0, 0);	
+	           }
 	        }
 	       outputVideo.write(frame);
 	    }
@@ -134,15 +134,15 @@ int main(int argc, char *argv[])
 		if(frame.empty()) break;
 
 		for (int i = 0; i < frame.rows; i++) {
-  	        	for (int j = 0; j < frame.cols; j++) {
-	                	Vec3b &inputPixel = frame.at<Vec3b>(i, j);
-		                Vec3b &outputPixel = copyFrame.at<Vec3b>(i, j);
-		                
-				//change colors using constants
-				outputPixel.val[0] = rconst * inputPixel.val[0];
-				outputPixel.val[1] = gconst * inputPixel.val[1];
-				outputPixel.val[2] = bconst * inputPixel.val[2];
-			}
+	        for (int j = 0; j < frame.cols; j++) {
+            	Vec3b &inputPixel = frame.at<Vec3b>(i, j);
+                Vec3b &outputPixel = copyFrame.at<Vec3b>(i, j);
+	                
+    			//change colors using constants
+    			outputPixel.val[0] = rconst * inputPixel.val[0];
+    			outputPixel.val[1] = gconst * inputPixel.val[1];
+    			outputPixel.val[2] = bconst * inputPixel.val[2];
+            }
 		}	
 	       outputVideo.write(copyFrame);
 	}
@@ -184,14 +184,14 @@ int main(int argc, char *argv[])
             if (frame.empty()) break; 
 
             for (int i = 0; i < cframe.cols; i++) {
-            for (int j = 0; j < cframe.rows; j++) {
+                for (int j = 0; j < cframe.rows; j++) {
                     Vec3b &intensity = frame.at<Vec3b>(j, i);
                     Vec3b &inverse = cframe.at<Vec3b>(j, i);
                     intensity.val[0] = inverse.val[0]>>1;
                     intensity.val[1] = inverse.val[1]>>1;
                     intensity.val[2] = inverse.val[2]>>1;
     
-                 }
+                }
             }
            outputVideo.write(frame);
         }
@@ -208,24 +208,24 @@ int main(int argc, char *argv[])
             if (frame.empty()) break; 
 
             for (int i = 0; i < cframe.cols; i+=2) {
-            for (int j = 0; j < cframe.rows; j+=2) {
-                  Vec3b &intensity = frame.at<Vec3b>(j, i);
+                for (int j = 0; j < cframe.rows; j+=2) {
+                    Vec3b &intensity = frame.at<Vec3b>(j, i);
                     Vec3b &inverse = cframe.at<Vec3b>(cframe.rows-j, cframe.cols-i);
                     intensity.val[0] = inverse.val[0];
                     intensity.val[1] = inverse.val[1];
                     intensity.val[2] = inverse.val[2];
     
-                 }
+                }
             }
             for (int i = 1; i < cframe.cols; i+=2) {
-            for (int j = 1; j < cframe.rows; j+=2) {
-                  Vec3b &intensity = frame.at<Vec3b>(j, i);
+                for (int j = 1; j < cframe.rows; j+=2) {
+                    Vec3b &intensity = frame.at<Vec3b>(j, i);
                     Vec3b &inverse = cframe.at<Vec3b>(cframe.rows-j, cframe.cols-i);
                     intensity.val[0] = inverse.val[0];
                     intensity.val[1] = inverse.val[1];
                     intensity.val[2] = inverse.val[2];
     
-                 }
+                }
             }
             
            outputVideo.write(frame);
