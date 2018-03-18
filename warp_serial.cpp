@@ -193,15 +193,15 @@ int main(int argc, char *argv[])
 	        	        Vec3b &out = copyFrame.at<Vec3b>(i, j);
 	                
     				//Create sepia values
-				tr = (int) (0.393 * in.val[0]) +
-				     	   (0.769 * in.val[1]) +
-				     	   (0.189 * in.val[2]);
-				tg = (int) (0.349 * in.val[0]) +
-				       	   (0.686 * in.val[1]) +
-				     	   (0.168 * in.val[2]);
-				tb = (int) (0.272 * in.val[0]) +
-				           (0.534 * in.val[1]) +
-				    	   (0.131 * in.val[2]);
+				tr = (int) (0.299 * in.val[0]) +
+				     	   (0.587 * in.val[1]) +
+				     	   (0.114 * in.val[2]);
+				tg = (int) (0.299 * in.val[0]) +
+				       	   (0.587 * in.val[1]) +
+				     	   (0.114 * in.val[2]);
+				tb = (int) (0.299 * in.val[0]) +
+				           (0.587 * in.val[1]) +
+				    	   (0.114 * in.val[2]);
 
 				// If they are over max value, set to max
 				if(tr > 255){ r = 255; } else { r = tr; }	
