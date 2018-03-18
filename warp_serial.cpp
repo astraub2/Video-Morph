@@ -113,7 +113,6 @@ int main(int argc, char *argv[])
 
 			for ( int i = 1; i < 31; i = i + 2 ) {
 				GaussianBlur( src, dst, Size( i, i ), 0, 0 );
-				if( display_dst( DELAY_BLUR ) != 0 ) { return 0; }
 			}
 /*
 		for ( int i = 1; i < ; i = i + 2 ){
