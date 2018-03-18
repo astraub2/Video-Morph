@@ -175,7 +175,6 @@ int main(int argc, char *argv[])
     if(Command=="darken"){
 
         cout<<"Darkening...."<<endl;
-        #pragma omp parallel for
         for(;;) 
             {
             Mat frame;
@@ -184,7 +183,6 @@ int main(int argc, char *argv[])
             inputVideo >> cframe;
             if (frame.empty()) break; 
 
-            #pragma omp parallel for
             for (int i = 0; i < cframe.cols; i++) {
             for (int j = 0; j < cframe.rows; j++) {
                     Vec3b &intensity = frame.at<Vec3b>(j, i);
@@ -201,7 +199,6 @@ int main(int argc, char *argv[])
     if(Command=="self_overlay"){
 
         cout<<"Overlaying...."<<endl;
-        #pragma omp parallel for
         for(;;) 
             {
             Mat frame;
@@ -210,7 +207,6 @@ int main(int argc, char *argv[])
             inputVideo >> cframe;
             if (frame.empty()) break; 
 
-            #pragma omp parallel for
             for (int i = 0; i < cframe.cols; i+=2) {
             for (int j = 0; j < cframe.rows; j+=2) {
                   Vec3b &intensity = frame.at<Vec3b>(j, i);
@@ -221,7 +217,6 @@ int main(int argc, char *argv[])
     
                  }
             }
-            #pragma omp parallel for
             for (int i = 1; i < cframe.cols; i+=2) {
             for (int j = 1; j < cframe.rows; j+=2) {
                   Vec3b &intensity = frame.at<Vec3b>(j, i);
