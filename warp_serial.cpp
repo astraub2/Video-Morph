@@ -120,7 +120,7 @@ int main(int argc, char *argv[])
 	cout << "Black and Whiting..." << endl;
 
 	Mat frame;
-	Mat cframe;
+	Mat copyFrame;
 
 	uchar pixValue;
 	float rconst = 0.2125;
@@ -129,22 +129,22 @@ int main(int argc, char *argv[])
 
 	for(;;){
 		inputVideo >> frame;
-		inputVideo >> cframe;
+		copyFrame = frame;
+
 		if(frame.empty()) break;
 
-		for (int i = 0; i < cframe.cols; i++) {
-  	        	for (int j = 0; j < cframe.rows; j++) {
-
-				Vec3b &intensity = frame.at<Vec3b>(i, j);
-				Vec3b &output = cframe.at<Vec3b>(i, j);
-
-				// Change each color value to black and white using constants	
-				intensity.val[0] = (int)(rconst * output.val[0]);
-				intensity.val[1] = (int)(gconst * output.val[1]);
-				intensity.val[2] = (int)(bconst * output.val[2]);
+		for (int i = 0; i < frame.row; i++) {
+  	        	for (int j = 0; j < frame.cols; j++) {
+	                	Vec3b &inputPixel = frame.at<Vec3b>(i, j);
+		                Vec3b &outputPixel = copyFrame.at<Vec3b>(i, j);
+		                
+				//change colors using constants
+				outputPixel.val[0] = rconst * inputPixel.val[0];
+				outputPixel.val[1] = gconst * inputPixel.val[1];
+				outputPixel.val[2] = bconst * inputPixel.val[2];
 			}
 		}	
-	       outputVideo.write(frame);
+	       outputVideo.write(copyFrame);
 	}
 
     } else if (Command == "watermark") {
