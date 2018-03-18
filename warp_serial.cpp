@@ -139,7 +139,8 @@ int main(int argc, char *argv[])
 	float rconst = 0.2125;
 	float gconst = 0.7154;
 	float bconst = 0.0721;
-	double luminosity;
+	char luminosity;
+	char avg;
 
 	for(;;){
 		inputVideo >> frame;
@@ -153,11 +154,12 @@ int main(int argc, char *argv[])
 	        	        Vec3b &outputPixel = copyFrame.at<Vec3b>(i, j);
 	                
     				//change colors using constants
-	    			luminosity = (char) (rconst * inputPixel.val[0] +
+	    			luminosity =  (rconst * inputPixel.val[0] +
 					     gconst * inputPixel.val[1] +
-					     gconst * inputPixel.val[2]);
+					     bconst * inputPixel.val[2]);
 
-				
+						
+	
 				outputPixel.val[0] = luminosity;
 				outputPixel.val[1] = luminosity;
 				outputPixel.val[2] = luminosity;
