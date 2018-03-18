@@ -101,12 +101,12 @@ int main(int argc, char *argv[])
     else if(Command=="blur"){
 
     	cout<<"Blurry...."<<endl;
+    	Mat frame;
+		Mat copyFrame;
     	for(;;) 
         	{
-	        Mat frame;
-	        inputVideo >> frame; // get a new frame from camera
-	        Mat cframe;
-	        inputVideo >> cframe;
+	        inputVideo >> frame;
+			copyFrame = frame;
 	        if (frame.empty()) break; 
 
 	        uchar pixValue;
@@ -114,12 +114,6 @@ int main(int argc, char *argv[])
 			for ( int i = 1; i < 31; i = i + 2 ) {
 				GaussianBlur( cframe, frame, Size( i, i ), 0, 0 );
 			}
-/*
-
-	        for (int i = 0; i < cframe.cols; i=i+2) {
-            		for (int j = 0; j < cframe.rows; j=j+2) {
-				GaussianBlur(cframe, frame, Size(i,i), 0, 0);	
-*/
 
 	       outputVideo.write(frame);
 	    }
@@ -153,7 +147,33 @@ int main(int argc, char *argv[])
 	        outputVideo.write(copyFrame);
 	}
 
-   } else if (Command == "sepia"){
+   } else if (Command == "negative"){
+	cout << "Negative..." << endl;
+	Mat frame;
+	Mat copyFrame;
+	uchar pixValue;
+
+	for(;;){
+		inputVideo >> frame;
+		copyFrame = frame;
+		if(frame.empty()) break;
+		for (int i = 0; i < frame.rows; i++) {
+	        	for (int j = 0; j < frame.cols; j++) {
+        	    		Vec3b &inputPixel = frame.at<Vec3b>(i, j);
+	        	        Vec3b &outputPixel = copyFrame.at<Vec3b>(i, j);
+	                
+    				//Create luminosity value
+	    			luminosity = (rconst * inputPixel.val[0] + gconst * inputPixel.val[1] + bconst * inputPixel.val[2]);
+				
+				outputPixel.val[0] = luminosity;
+				outputPixel.val[1] = luminosity;
+				outputPixel.val[2] = luminosity;
+            		}
+		}	
+	        outputVideo.write(copyFrame);
+	}
+
+	} else if (Command == "sepia"){
 	cout << "Sepia..." << endl;
 	Mat frame;
 	Mat copyFrame;
