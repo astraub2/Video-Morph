@@ -135,13 +135,13 @@ int main(int argc, char *argv[])
 		for (int i = 0; i < cframe.cols; i++) {
   	        	for (int j = 0; j < cframe.rows; j++) {
 
-				Vec3b &outframe = frame.at<Vec3b>(i, j);
-                		Vec3b &inframe = cframe.at<Vec3b>(i, j);
+				Vec3b &intensity = frame.at<Vec3b>(i, j);
+				Vec3b &output = cframe.at<Vec3b>(i, j);
 
-				// Change each color value to black and white	
-				outframe.val[0] = (int)(rconst * inframe.val[0]);
-				outframe.val[1] = (int)(rconst * inframe.val[1]);
-				outframe.val[2] = (int)(rconst * inframe.val[2]);
+				// Change each color value to black and white using constants	
+				intensity.val[0] = (int)(rconst * output.val[0]);
+				intensity.val[1] = (int)(gconst * output.val[1]);
+				intensity.val[2] = (int)(bconst * output.val[2]);
 			}
 		}	
 	       outputVideo.write(frame);
