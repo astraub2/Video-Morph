@@ -112,7 +112,7 @@ int main(int argc, char *argv[])
 	        uchar pixValue;
 
 			for ( int i = 1; i < 31; i = i + 2 ) {
-				GaussianBlur( cframe, frame, Size( i, i ), 0, 0 );
+				GaussianBlur( copyFrame, frame, Size( i, i ), 0, 0 );
 			}
 
 	       outputVideo.write(frame);
