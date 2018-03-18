@@ -96,7 +96,27 @@ int main(int argc, char *argv[])
 	       outputVideo.write(frame);
 	    }
     
-    } else if (Command == "bw"){
+    } if(Command=="blur"){
+
+    	cout<<"Blurry...."<<endl;
+    	for(;;) 
+        	{
+	        Mat frame;
+	        inputVideo >> frame; // get a new frame from camera
+	        Mat cframe;
+	        inputVideo >> cframe;
+	        if (frame.empty()) break; 
+
+	        uchar pixValue;
+	        for (int i = 0; i < cframe.cols; i=i+2) {
+            		for (int j = 0; j < cframe.rows; j=j+2) {
+				GaussianBlur(cframe, frame, Size(i,j), 0, 0);	
+	             }
+	        }
+	       outputVideo.write(frame);
+	    }
+
+   } else if (Command == "bw"){
 	cout << "Black and Whiting..." << endl;
 
 	Mat frame;
