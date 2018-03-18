@@ -133,7 +133,7 @@ int main(int argc, char *argv[])
 
 		if(frame.empty()) break;
 
-		for (int i = 0; i < frame.row; i++) {
+		for (int i = 0; i < frame.rows; i++) {
   	        	for (int j = 0; j < frame.cols; j++) {
 	                	Vec3b &inputPixel = frame.at<Vec3b>(i, j);
 		                Vec3b &outputPixel = copyFrame.at<Vec3b>(i, j);
