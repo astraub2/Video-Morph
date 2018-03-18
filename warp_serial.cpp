@@ -101,12 +101,12 @@ int main(int argc, char *argv[])
     else if(Command=="blur"){
 
     	cout<<"Blurry...."<<endl;
+    	Mat frame;
+		Mat copyFrame;
     	for(;;) 
         	{
-	        Mat frame;
-	        inputVideo >> frame; // get a new frame from camera
-	        Mat cframe;
-	        inputVideo >> cframe;
+	        inputVideo >> frame;
+			copyFrame = frame;
 	        if (frame.empty()) break; 
 
 	        uchar pixValue;
@@ -114,12 +114,6 @@ int main(int argc, char *argv[])
 			for ( int i = 1; i < 31; i = i + 2 ) {
 				GaussianBlur( cframe, frame, Size( i, i ), 0, 0 );
 			}
-/*
-
-	        for (int i = 0; i < cframe.cols; i=i+2) {
-            		for (int j = 0; j < cframe.rows; j=j+2) {
-				GaussianBlur(cframe, frame, Size(i,i), 0, 0);	
-*/
 
 	       outputVideo.write(frame);
 	    }
@@ -153,7 +147,30 @@ int main(int argc, char *argv[])
 	        outputVideo.write(copyFrame);
 	}
 
-   } else if (Command == "sepia"){
+   } else if (Command == "negative"){
+	cout << "Negative..." << endl;
+	Mat frame;
+	Mat copyFrame;
+	uchar pixValue;
+
+	for(;;){
+		inputVideo >> frame;
+		copyFrame = frame;
+		if(frame.empty()) break;
+		for (int i = 0; i < frame.rows; i++) {
+	        	for (int j = 0; j < frame.cols; j++) {
+    	    		Vec3b &inputPixel = frame.at<Vec3b>(i, j);
+        	        Vec3b &outputPixel = copyFrame.at<Vec3b>(i, j);
+				
+					outputPixel.val[0] = 255 - inputPixel.val[0];
+					outputPixel.val[1] = 255 - inputPixel.val[1];
+					outputPixel.val[2] = 255 - inputPixel.val[2];
+            	}
+		}	
+	        outputVideo.write(copyFrame);
+	}
+
+	} else if (Command == "sepia"){
 	cout << "Sepia..." << endl;
 	Mat frame;
 	Mat copyFrame;
@@ -305,13 +322,68 @@ int main(int argc, char *argv[])
 	resize(frame, q2, q2.size(), 0, 0, interpolation);
 	resize(frame, q3, q3.size(), 0, 0, interpolation);
 	resize(frame, q4, dst.size(), 0, 0, interpolation);
-	
+ 	
+	int offset = 32;	
+
         for(int i = 0; i < halfrow; i++){
 	    for(int j = 0; j < halfcol; j++){	
 		Vec3b &q1color = q1.at<Vec3b>(j,i);
 		Vec3b &q2color = q2.at<Vec3b>(j,i);
 		Vec3b &q3color = q3.at<Vec3b>(j,i);
 		Vec3b &q4color = q4.at<Vec3b>(j,i);
+
+		q1color.val[0] += offset;
+		q1color.val[1] += offset;
+		q1color.val[2] += offset;
+		q2color.val[0] += (offset*2);
+		q2color.val[1] += (offset*2);
+		q2color.val[2] += (offset*2);
+		q3color.val[0] += (offset*3);
+		q3color.val[1] += (offset*3);
+		q3color.val[2] += (offset*3);
+		q4color.val[0] += (offset*4);
+		q4color.val[1] += (offset*4);
+		q4color.val[2] += (offset*4);
+	    }
+	}
+	for(int i = 0; i < halfrow; i++){
+	    for(int j = 0; j < halfcol; j++){
+		Vec3b &newframecolor = newframe.at<Vec3b>(j,i);
+		Vec3b &q1color = q1.at<Vec3b>(j, i);
+		newframecolor.val[0] = q1color.val[0];
+		newframecolor.val[1] = q1color.val[1];
+		newframecolor.val[2] = q1color.val[2];
+	    }
+	}
+	for(int i = halfrow; i < (halfrow*2); i++){
+	    for(int j = 0; j < halfcol; j++){
+		Vec3b &newframecolor = newframe.at<Vec3b>(j,i);
+		Vec3b &q2color = q2.at<Vec3b>(j, i);
+		newframecolor.val[0] = q2color.val[0];
+		newframecolor.val[1] = q2color.val[1];
+		newframecolor.val[2] = q2color.val[2];
+	    }
+	}
+	for(int i = 0; i < halfrow; i++){
+	    for(int j = halfcol; j < (halfcol*2); j++){
+		Vec3b &newframecolor = newframe.at<Vec3b>(j,i);
+		Vec3b &q3color = q3.at<Vec3b>(j, i);
+		newframecolor.val[0] = q3color.val[0];
+		newframecolor.val[1] = q3color.val[1];
+		newframecolor.val[2] = q3color.val[2];
+	    }
+	}
+	for(int i = halfrow; i < (halfrow*2); i++){
+	    for(int j = halfcol; j < (halfcol*2); j++){
+		Vec3b &newframecolor = newframe.at<Vec3b>(j,i);
+		Vec3b &q4color = q4.at<Vec3b>(j, i);
+		newframecolor.val[0] = q4color.val[0];
+		newframecolor.val[1] = q4color.val[1];
+		newframecolor.val[2] = q4color.val[2];
+	    }
+	}
+	outputVideo.write(frame);
+    }
     }	
 
     inputVideo.release();
