@@ -111,32 +111,23 @@ int main(int argc, char *argv[])
 
 	        uchar pixValue;
 
-		for (int i=1; i < 31; i=i+2){
-			GaussianBlur(cframe, frame, Size(i,i), 0,0);
-		}
+			for ( int i = 1; i < 31; i = i + 2 ) {
+				GaussianBlur( cframe, frame, Size( i, i ), 0, 0 );
+			}
 /*
-		for ( int i = 1; i < ; i = i + 2 ){
-    			GaussianBlur( src, dst, Size( i, i ), 0, 0 );
-        		if( display_dst( DELAY_BLUR ) != 0 ) { return 0; }
-		}
 
-
-/*
 	        for (int i = 0; i < cframe.cols; i=i+2) {
             		for (int j = 0; j < cframe.rows; j=j+2) {
 				GaussianBlur(cframe, frame, Size(i,i), 0, 0);	
 */
-	             
-	        
+
 	       outputVideo.write(frame);
-	       }
+	    }
 
    } else if (Command == "bw"){
 	cout << "Black and Whiting..." << endl;
-
 	Mat frame;
 	Mat copyFrame;
-
 	uchar pixValue;
 	float rconst = 0.2125;
 	float gconst = 0.7154;
@@ -146,22 +137,63 @@ int main(int argc, char *argv[])
 	for(;;){
 		inputVideo >> frame;
 		copyFrame = frame;
-
 		if(frame.empty()) break;
-
 		for (int i = 0; i < frame.rows; i++) {
 	        	for (int j = 0; j < frame.cols; j++) {
         	    		Vec3b &inputPixel = frame.at<Vec3b>(i, j);
 	        	        Vec3b &outputPixel = copyFrame.at<Vec3b>(i, j);
 	                
-    				//Create luminosity values
-	    			luminosity = (rconst * inputPixel.val[0] +
-					      gconst * inputPixel.val[1] +
-					      bconst * inputPixel.val[2]);
-
+    				//Create luminosity value
+	    			luminosity = (rconst * inputPixel.val[0] + gconst * inputPixel.val[1] + bconst * inputPixel.val[2]);
 				outputPixel.val[0] = luminosity;
 				outputPixel.val[1] = luminosity;
 				outputPixel.val[2] = luminosity;
+            		}
+		}	
+	        outputVideo.write(copyFrame);
+	}
+
+   } else if (Command == "sepia"){
+	cout << "Sepia..." << endl;
+	Mat frame;
+	Mat copyFrame;
+	uchar pixValue;
+
+	double tr;
+	double tg;
+	double tb;
+	char r;
+	char g;
+	char b;
+
+	for(;;){
+		inputVideo >> frame;
+		copyFrame = frame;
+		if(frame.empty()) break;
+		for (int i = 0; i < frame.rows; i++) {
+	        	for (int j = 0; j < frame.cols; j++) {
+        	    		Vec3b &in = frame.at<Vec3b>(i, j);
+	        	        Vec3b &out = copyFrame.at<Vec3b>(i, j);
+	                
+    				//Create sepia values
+				tr = (0.393 * in.val[0]) +
+				     (0.769 * in.val[1]) +
+				     (0.189 * in.val[2]);
+				tg = (0.349 * in.val[0]) +
+				     (0.686 * in.val[1]) +
+				     (0.168 * in.val[2]);
+				tb = (0.272 * in.val[0]) +
+				     (0.534 * in.val[1]) +
+				     (0.131 * in.val[2]);
+
+				// If they are over max value, set to max
+				if(tr > 255){ r = 255; } else { r = tr; }	
+				if(tg > 255){ g = 255; } else { g = tg; }	
+				if(tb > 255){ b = 255; } else { b = tb; }	
+
+				outputPixel.val[0] = r;
+				outputPixel.val[1] = g;
+				outputPixel.val[2] = b;
             		}
 		}	
 	        outputVideo.write(copyFrame);
