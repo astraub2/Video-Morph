@@ -153,10 +153,11 @@ int main(int argc, char *argv[])
 	        	        Vec3b &outputPixel = copyFrame.at<Vec3b>(i, j);
 	                
     				//change colors using constants
-	    			luminosity = rconst * inputPixel.val[0] +
+	    			luminosity = (char) (rconst * inputPixel.val[0] +
 					     gconst * inputPixel.val[1] +
-					     gconst * inputPixel.val[2];
+					     gconst * inputPixel.val[2]);
 
+				
 				outputPixel.val[0] = luminosity;
 				outputPixel.val[1] = luminosity;
 				outputPixel.val[2] = luminosity;
