@@ -80,6 +80,58 @@ void invert_s(VideoCapture inputVideo, VideoWriter outputVideo){
            outputVideo.write(frame);
         }
 }
+void self_overlay_s(VideoCapture inputVideo, VideoWriter outputVideo){
+	 cout<<"Overlaying...."<<endl;
+        for(;;) 
+            {
+            Mat frame;
+            inputVideo >> frame; // get a new frame from camera
+            Mat cframe=frame.clone();
+            double opacity = .5;
+            if (frame.empty()) break; 
+            for (int i = 0; i < cframe.cols; i++) {
+                for (int j = 0; j < cframe.rows; j++) {
+                    Vec3b &intensity = frame.at<Vec3b>(j, i);
+                    Vec3b &inverse = cframe.at<Vec3b>(cframe.rows-j, cframe.cols-i);
+              
+                    intensity.val[0] = inverse.val[0]*opacity + intensity.val[0]*(1-opacity);
+                    intensity.val[1] = inverse.val[1]*opacity + intensity.val[1]*(1-opacity);
+                    intensity.val[2] = inverse.val[2]*opacity + intensity.val[2]*(1-opacity);
+    
+                }
+            }
+            
+           outputVideo.write(frame);
+        }
+
+}
+void self_overlay_p(VideoCapture inputVideo, VideoWriter outputVideo){
+	 cout<<"Overlaying...."<<endl;
+        #pragma omp parallel for
+        for(;;) 
+            {
+            Mat frame;
+            inputVideo >> frame; // get a new frame from camera
+            Mat cframe=frame.clone();
+            double opacity = .5;
+            if (frame.empty()) break; 
+            #pragma omp parallel for
+            for (int i = 0; i < cframe.cols; i++) {
+                for (int j = 0; j < cframe.rows; j++) {
+                    Vec3b &intensity = frame.at<Vec3b>(j, i);
+                    Vec3b &inverse = cframe.at<Vec3b>(cframe.rows-j, cframe.cols-i);
+              
+                    intensity.val[0] = inverse.val[0]*opacity + intensity.val[0]*(1-opacity);
+                    intensity.val[1] = inverse.val[1]*opacity + intensity.val[1]*(1-opacity);
+                    intensity.val[2] = inverse.val[2]*opacity + intensity.val[2]*(1-opacity);
+    
+                }
+            }
+            
+           outputVideo.write(frame);
+        }
+
+}
 
 int main(int argc, char *argv[])
 {
@@ -141,6 +193,12 @@ int main(int argc, char *argv[])
 		}
 
     
+    }
+    else if(Command=="self_overlay"){
+    	if(processing=="-serial")
+        	self_overlay_s(inputVideo, outputVideo);
+        else if(processing=="-parallel")
+        	self_overlay_p(inputVideo, outputVideo);
     }
     else{
         	inputVideo.release();
