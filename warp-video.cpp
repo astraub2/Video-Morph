@@ -141,7 +141,13 @@ int main(int argc, char *argv[])
 		}
 
     
-    }  
+    }
+    else{
+        	inputVideo.release();
+		    outputVideo.release();
+		    cout << "Bad input, see usage" << endl;
+		    return 0;
+		}
     auto t2 = Clock::now();
     std::cout << "Runtime: "
     << std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count()
