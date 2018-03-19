@@ -1,3 +1,5 @@
+#include <chrono>
+
 #include <iostream> // for standard I/O
 #include <string>   // for strings
 
@@ -10,6 +12,7 @@
 using namespace std;
 using namespace cv;
 //WITH_FFMPEG=ON
+typedef std::chrono::high_resolution_clock Clock;
 static void help()
 {
     cout
@@ -70,7 +73,7 @@ int main(int argc, char *argv[])
     cout << "Input frame resolution: Width=" << S.width << "  Height=" << S.height
          << " of nr#: " << inputVideo.get(CV_CAP_PROP_FRAME_COUNT) << endl;
     
-
+    auto t1 = Clock::now();
     if(Command=="invert"){
 
         cout<<"Inverting...."<<endl;
@@ -225,6 +228,10 @@ int main(int argc, char *argv[])
            outputVideo.write(frame);
         }
     }
+    auto t2 = Clock::now();
+    std::cout << "Parallel runtime: "
+    << std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count()
+    << " milliseconds" << std::endl;
 
     inputVideo.release();
     outputVideo.release();
