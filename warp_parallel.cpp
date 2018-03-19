@@ -61,8 +61,8 @@ int main(int argc, char *argv[])
     Size S = Size((int) inputVideo.get(CV_CAP_PROP_FRAME_WIDTH),    // Acquire input size
                   (int) inputVideo.get(CV_CAP_PROP_FRAME_HEIGHT));
 
-    VideoWriter outputVideo;                                        // Open the output
-    outputVideo.open(NAME, ex=0, inputVideo.get(CV_CAP_PROP_FPS)*.5, S, true);
+    VideoWriter outputVideo;                                     // Open the output
+    outputVideo.open(NAME, ex=0, inputVideo.get(CV_CAP_PROP_FPS), S, true);
     
     if (!outputVideo.isOpened())
     {
