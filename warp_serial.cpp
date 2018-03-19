@@ -311,18 +311,18 @@ int main(int argc, char *argv[])
 
         Mat cframe(frame.rows, frame.cols, frame.type());
         
-	Mat newframe(frame.rows, frame.cols, frame.type()); //new frame same size as original
+	Mat newframe = Mat::zeros(frame.rows, frame.cols, frame.type()); //new frame same size as original
         int halfrow = frame.rows/2;
 	int halfcol = frame.cols/2; 
-        Mat q1(halfrow, halfcol, frame.type());
-        Mat q2(halfrow, halfcol, frame.type());
-        Mat q3(halfrow, halfcol, frame.type());
-        Mat q4(halfrow, halfcol, frame.type());
+        Mat q1 = Mat::zeros(halfrow, halfcol, frame.type());
+        Mat q2 = Mat::zeros(halfrow, halfcol, frame.type());
+        Mat q3 = Mat::zeros(halfrow, halfcol, frame.type());
+        Mat q4 = Mat::zeros(halfrow, halfcol, frame.type());
 
-	resize(frame, q1, q1.size(), 0, 0, INTER_AREA);
-	resize(frame, q2, q2.size(), 0, 0, INTER_AREA);
-	resize(frame, q3, q3.size(), 0, 0, INTER_AREA);
-	resize(frame, q4, q4.size(), 0, 0, INTER_AREA);
+	resize(frame, q1, Size(), 0.5, 0.5, INTER_AREA);
+	resize(frame, q2, Size(), 0.5, 0.5, INTER_AREA);
+	resize(frame, q3, Size(), 0.5, 0.5, INTER_AREA);
+	resize(frame, q4, Size(), 0.5, 0.5, INTER_AREA);
  	
 	int offset = 32;	
 
