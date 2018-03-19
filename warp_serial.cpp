@@ -59,7 +59,7 @@ int main(int argc, char *argv[])
                   (int) inputVideo.get(CV_CAP_PROP_FRAME_HEIGHT));
 
     VideoWriter outputVideo;                                        // Open the output
-    outputVideo.open(NAME, ex=0, inputVideo.get(CV_CAP_PROP_FPS)*.5, S, true);
+    outputVideo.open(NAME, ex=0, inputVideo.get(CV_CAP_PROP_FPS), S, true);
     
     if (!outputVideo.isOpened())
     {
@@ -78,8 +78,8 @@ int main(int argc, char *argv[])
         	{
 	        Mat frame;
 	        inputVideo >> frame; // get a new frame from camera
-	        Mat cframe;
-	        inputVideo >> cframe;
+	        Mat cframe=frame.clone();
+	        
 	        if (frame.empty()) break; 
 
 	        uchar pixValue;
@@ -248,8 +248,7 @@ int main(int argc, char *argv[])
             {
             Mat frame;
             inputVideo >> frame; // get a new frame from camera
-            Mat cframe;
-            inputVideo >> cframe;
+            Mat cframe=frame.clone();
             if (frame.empty()) break; 
 
             for (int i = 0; i < cframe.cols; i++) {
@@ -272,27 +271,18 @@ int main(int argc, char *argv[])
             {
             Mat frame;
             inputVideo >> frame; // get a new frame from camera
-            Mat cframe;
-            inputVideo >> cframe;
+            Mat cframe=frame.clone();
+            double opacity = .5;
             if (frame.empty()) break; 
 
-            for (int i = 0; i < cframe.cols; i+=2) {
-                for (int j = 0; j < cframe.rows; j+=2) {
+            for (int i = 0; i < cframe.cols; i++) {
+                for (int j = 0; j < cframe.rows; j++) {
                     Vec3b &intensity = frame.at<Vec3b>(j, i);
                     Vec3b &inverse = cframe.at<Vec3b>(cframe.rows-j, cframe.cols-i);
-                    intensity.val[0] = inverse.val[0];
-                    intensity.val[1] = inverse.val[1];
-                    intensity.val[2] = inverse.val[2];
-    
-                }
-            }
-            for (int i = 1; i < cframe.cols; i+=2) {
-                for (int j = 1; j < cframe.rows; j+=2) {
-                    Vec3b &intensity = frame.at<Vec3b>(j, i);
-                    Vec3b &inverse = cframe.at<Vec3b>(cframe.rows-j, cframe.cols-i);
-                    intensity.val[0] = inverse.val[0];
-                    intensity.val[1] = inverse.val[1];
-                    intensity.val[2] = inverse.val[2];
+              
+                    intensity.val[0] = inverse.val[0]*opacity + intensity.val[0]*(1-opacity);
+                    intensity.val[1] = inverse.val[1]*opacity + intensity.val[1]*(1-opacity);
+                    intensity.val[2] = inverse.val[2]*opacity + intensity.val[2]*(1-opacity);
     
                 }
             }

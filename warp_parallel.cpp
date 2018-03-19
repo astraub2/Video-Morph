@@ -73,30 +73,32 @@ int main(int argc, char *argv[])
 
     if(Command=="invert"){
 
-    	cout<<"Inverting...."<<endl;
-    	for(;;) 
-        	{
-	        Mat frame;
-	        inputVideo >> frame; // get a new frame from camera
-	        Mat cframe;
-	        inputVideo >> cframe;
-	        if (frame.empty()) break; 
+        cout<<"Inverting...."<<endl;
+        #pragma omp parallel for
+        for(;;) 
+            {
+            Mat frame;
+            inputVideo >> frame; // get a new frame from camera
+            Mat cframe=frame.clone();
+            
+            if (frame.empty()) break; 
 
-	        uchar pixValue;
-	        for (int i = 0; i < cframe.cols; i++) {
-            for (int j = 0; j < cframe.rows; j++) {
-	                Vec3b &intensity = frame.at<Vec3b>(j, i);
-	                Vec3b &inverse = cframe.at<Vec3b>(cframe.rows-j, cframe.cols-i);
-	                intensity.val[0] = inverse.val[0];
-	                intensity.val[1] = inverse.val[1];
-	                intensity.val[2] = inverse.val[2];
-	
-	             }
-	        }
-	       outputVideo.write(frame);
-	    }
+            uchar pixValue;
+            #pragma omp parallel for
+            for (int i = 0; i < cframe.cols; i++) {
+                for (int j = 0; j < cframe.rows; j++) {
+                    Vec3b &intensity = frame.at<Vec3b>(j, i);
+                    Vec3b &inverse = cframe.at<Vec3b>(cframe.rows-j, cframe.cols-i);
+                    intensity.val[0] = inverse.val[0];
+                    intensity.val[1] = inverse.val[1];
+                    intensity.val[2] = inverse.val[2];
     
-    } if(Command=="blur"){
+               }
+            }
+           outputVideo.write(frame);
+        }
+    
+    }  if(Command=="blur"){
 
     	cout<<"Blurry...."<<endl;
     	for(;;) 
@@ -172,7 +174,7 @@ int main(int argc, char *argv[])
            outputVideo.write(frame);
         }
     }
-    if(Command=="darken"){
+    else if(Command=="darken"){
 
         cout<<"Darkening...."<<endl;
         #pragma omp parallel for
@@ -180,25 +182,23 @@ int main(int argc, char *argv[])
             {
             Mat frame;
             inputVideo >> frame; // get a new frame from camera
-            Mat cframe;
-            inputVideo >> cframe;
+            Mat cframe=frame.clone();
             if (frame.empty()) break; 
-
             #pragma omp parallel for
             for (int i = 0; i < cframe.cols; i++) {
-            for (int j = 0; j < cframe.rows; j++) {
+                for (int j = 0; j < cframe.rows; j++) {
                     Vec3b &intensity = frame.at<Vec3b>(j, i);
                     Vec3b &inverse = cframe.at<Vec3b>(j, i);
                     intensity.val[0] = inverse.val[0]>>1;
                     intensity.val[1] = inverse.val[1]>>1;
                     intensity.val[2] = inverse.val[2]>>1;
     
-                 }
+                }
             }
            outputVideo.write(frame);
         }
     }
-    if(Command=="self_overlay"){
+    else if(Command=="self_overlay"){
 
         cout<<"Overlaying...."<<endl;
         #pragma omp parallel for
@@ -206,31 +206,20 @@ int main(int argc, char *argv[])
             {
             Mat frame;
             inputVideo >> frame; // get a new frame from camera
-            Mat cframe;
-            inputVideo >> cframe;
+            Mat cframe=frame.clone();
+            double opacity = .5;
             if (frame.empty()) break; 
-
             #pragma omp parallel for
-            for (int i = 0; i < cframe.cols; i+=2) {
-            for (int j = 0; j < cframe.rows; j+=2) {
-                  Vec3b &intensity = frame.at<Vec3b>(j, i);
+            for (int i = 0; i < cframe.cols; i++) {
+                for (int j = 0; j < cframe.rows; j++) {
+                    Vec3b &intensity = frame.at<Vec3b>(j, i);
                     Vec3b &inverse = cframe.at<Vec3b>(cframe.rows-j, cframe.cols-i);
-                    intensity.val[0] = inverse.val[0];
-                    intensity.val[1] = inverse.val[1];
-                    intensity.val[2] = inverse.val[2];
+              
+                    intensity.val[0] = inverse.val[0]*opacity + intensity.val[0]*(1-opacity);
+                    intensity.val[1] = inverse.val[1]*opacity + intensity.val[1]*(1-opacity);
+                    intensity.val[2] = inverse.val[2]*opacity + intensity.val[2]*(1-opacity);
     
-                 }
-            }
-            #pragma omp parallel for
-            for (int i = 1; i < cframe.cols; i+=2) {
-            for (int j = 1; j < cframe.rows; j+=2) {
-                  Vec3b &intensity = frame.at<Vec3b>(j, i);
-                    Vec3b &inverse = cframe.at<Vec3b>(cframe.rows-j, cframe.cols-i);
-                    intensity.val[0] = inverse.val[0];
-                    intensity.val[1] = inverse.val[1];
-                    intensity.val[2] = inverse.val[2];
-    
-                 }
+                }
             }
             
            outputVideo.write(frame);
