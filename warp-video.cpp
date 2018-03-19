@@ -180,6 +180,260 @@ void darken_p(VideoCapture inputVideo, VideoWriter outputVideo){
 
 }
 
+void watermark_s(VideoCapture inputVideo, VideoWriter outputVideo, watermark_img_file) {
+    cout<<"Adding watermark..."<<endl;
+        Mat wframe = imread(watermark_img_file);
+        double opacity = .25;
+        int offset = 100;
+        for(;;){
+            Mat frame;
+            inputVideo >> frame; // get a new frame from camera
+            
+            if (frame.empty()) break; 
+
+            for (int i = 0; i < wframe.rows; i++) {
+                for (int j = 0; j < wframe.cols; j++) {
+                    Vec3b &intensity = frame.at<Vec3b>(i+offset, j+offset);
+                    Vec3b &watermark = wframe.at<Vec3b>(i, j);
+                    intensity.val[0] = watermark.val[0]*opacity + intensity.val[0]*(1-opacity);
+                    intensity.val[1] = watermark.val[1]*opacity + intensity.val[1]*(1-opacity);
+                    intensity.val[2] = watermark.val[2]*opacity + intensity.val[2]*(1-opacity);
+        
+                }
+            }
+           outputVideo.write(frame);
+        }
+}
+
+void watermark_p(VideoCapture inputVideo, VideoWriter outputVideo, watermark_img_file) {
+    cout<<"Adding watermark..."<<endl;
+        Mat wframe = imread(watermark_img_file);
+        double opacity = .25;
+        int offset = 100;
+        for(;;){
+            Mat frame;
+            inputVideo >> frame; // get a new frame from camera
+            
+            if (frame.empty()) break; 
+            #pragma omp parallel for
+            for (int i = 0; i < wframe.rows; i++) {
+                for (int j = 0; j < wframe.cols; j++) {
+                    Vec3b &intensity = frame.at<Vec3b>(i+offset, j+offset);
+                    Vec3b &watermark = wframe.at<Vec3b>(i, j);
+                    intensity.val[0] = watermark.val[0]*opacity + intensity.val[0]*(1-opacity);
+                    intensity.val[1] = watermark.val[1]*opacity + intensity.val[1]*(1-opacity);
+                    intensity.val[2] = watermark.val[2]*opacity + intensity.val[2]*(1-opacity);
+        
+                }
+            }
+           outputVideo.write(frame);
+        }
+}
+
+void bw_s(VideoCapture inputVideo, VideoWriter outputVideo) {
+    cout << "Black and Whiting..." << endl;
+    Mat frame;
+    Mat copyFrame;
+    uchar pixValue;
+    float rconst = 0.2125;
+    float gconst = 0.7154;
+    float bconst = 0.0721;
+    char luminosity;
+
+    for(;;){
+        inputVideo >> frame;
+        copyFrame = frame;
+        if(frame.empty()) break;
+        for (int i = 0; i < frame.rows; i++) {
+                for (int j = 0; j < frame.cols; j++) {
+                        Vec3b &inputPixel = frame.at<Vec3b>(i, j);
+                        Vec3b &outputPixel = copyFrame.at<Vec3b>(i, j);
+                    
+                    //Create luminosity value
+                    luminosity = (rconst * inputPixel.val[0] + gconst * inputPixel.val[1] + bconst * inputPixel.val[2]);
+                outputPixel.val[0] = luminosity;
+                outputPixel.val[1] = luminosity;
+                outputPixel.val[2] = luminosity;
+                    }
+        }   
+            outputVideo.write(copyFrame);
+    }
+}
+
+void bw_p(VideoCapture inputVideo, VideoWriter outputVideo) {
+    cout << "Black and Whiting..." << endl;
+    Mat frame;
+    Mat copyFrame;
+    uchar pixValue;
+    float rconst = 0.2125;
+    float gconst = 0.7154;
+    float bconst = 0.0721;
+    char luminosity;
+
+    for(;;){
+        inputVideo >> frame;
+        copyFrame = frame;
+        if(frame.empty()) break;
+        #pragma omp parallel for
+        for (int i = 0; i < frame.rows; i++) {
+                for (int j = 0; j < frame.cols; j++) {
+                        Vec3b &inputPixel = frame.at<Vec3b>(i, j);
+                        Vec3b &outputPixel = copyFrame.at<Vec3b>(i, j);
+                    
+                    //Create luminosity value
+                    luminosity = (rconst * inputPixel.val[0] + gconst * inputPixel.val[1] + bconst * inputPixel.val[2]);
+                outputPixel.val[0] = luminosity;
+                outputPixel.val[1] = luminosity;
+                outputPixel.val[2] = luminosity;
+                    }
+        }   
+            outputVideo.write(copyFrame);
+    }
+}
+
+void negative_s(VideoCapture inputVideo, VideoWriter outputVideo) {
+    cout << "Negative..." << endl;
+    Mat frame;
+    Mat copyFrame;
+    uchar pixValue;
+
+    for(;;){
+        inputVideo >> frame;
+        copyFrame = frame;
+        if(frame.empty()) break;
+        for (int i = 0; i < frame.rows; i++) {
+                for (int j = 0; j < frame.cols; j++) {
+                    Vec3b &inputPixel = frame.at<Vec3b>(i, j);
+                    Vec3b &outputPixel = copyFrame.at<Vec3b>(i, j);
+                
+                    outputPixel.val[0] = 255 - inputPixel.val[0];
+                    outputPixel.val[1] = 255 - inputPixel.val[1];
+                    outputPixel.val[2] = 255 - inputPixel.val[2];
+                }
+        }   
+            outputVideo.write(copyFrame);
+    }
+}
+
+void negative_p(VideoCapture inputVideo, VideoWriter outputVideo) {
+    cout << "Negative..." << endl;
+    Mat frame;
+    Mat copyFrame;
+    uchar pixValue;
+
+    for(;;){
+        inputVideo >> frame;
+        copyFrame = frame;
+        if(frame.empty()) break;
+        #pragma omp parallel for
+        for (int i = 0; i < frame.rows; i++) {
+                for (int j = 0; j < frame.cols; j++) {
+                    Vec3b &inputPixel = frame.at<Vec3b>(i, j);
+                    Vec3b &outputPixel = copyFrame.at<Vec3b>(i, j);
+                
+                    outputPixel.val[0] = 255 - inputPixel.val[0];
+                    outputPixel.val[1] = 255 - inputPixel.val[1];
+                    outputPixel.val[2] = 255 - inputPixel.val[2];
+                }
+        }   
+            outputVideo.write(copyFrame);
+    }
+}
+
+void sepia_s(VideoCapture inputVideo, VideoWriter outputVideo) {
+    cout << "Sepia..." << endl;
+    Mat frame;
+    Mat copyFrame;
+    uchar pixValue;
+
+    int tr;
+    int tg;
+    int tb;
+    int r;
+    int g;
+    int b;
+
+    for(;;){
+        inputVideo >> frame;
+        copyFrame = frame;
+        if(frame.empty()) break;
+        #pragma omp parallel for
+        for (int i = 0; i < frame.rows; i++) {
+                for (int j = 0; j < frame.cols; j++) {
+                        Vec3b &in = frame.at<Vec3b>(i, j);
+                        Vec3b &out = copyFrame.at<Vec3b>(i, j);
+                    
+                    //Create sepia values
+                tr = (int) (0.299 * in.val[0]) +
+                           (0.587 * in.val[1]) +
+                           (0.114 * in.val[2]);
+                tg = (int) (0.299 * in.val[0]) +
+                           (0.587 * in.val[1]) +
+                           (0.114 * in.val[2]);
+                tb = (int) (0.299 * in.val[0]) +
+                           (0.587 * in.val[1]) +
+                           (0.114 * in.val[2]);
+
+                // If they are over max value, set to max
+                if(tr > 255){ r = 255; } else { r = tr; }   
+                if(tg > 255){ g = 255; } else { g = tg; }   
+                if(tb > 255){ b = 255; } else { b = tb; }   
+
+                out.val[0] = r;
+                out.val[1] = g;
+                out.val[2] = b;
+                    }
+        }   
+            outputVideo.write(copyFrame);
+    }
+}
+
+void sepia_p(VideoCapture inputVideo, VideoWriter outputVideo) {
+    cout << "Sepia..." << endl;
+    Mat frame;
+    Mat copyFrame;
+    uchar pixValue;
+
+    int tr;
+    int tg;
+    int tb;
+    int r;
+    int g;
+    int b;
+
+    for(;;){
+        inputVideo >> frame;
+        copyFrame = frame;
+        if(frame.empty()) break;
+        for (int i = 0; i < frame.rows; i++) {
+                for (int j = 0; j < frame.cols; j++) {
+                        Vec3b &in = frame.at<Vec3b>(i, j);
+                        Vec3b &out = copyFrame.at<Vec3b>(i, j);
+                    
+                    //Create sepia values
+                tr = (int) (0.299 * in.val[0]) +
+                           (0.587 * in.val[1]) +
+                           (0.114 * in.val[2]);
+                tg = (int) (0.299 * in.val[0]) +
+                           (0.587 * in.val[1]) +
+                           (0.114 * in.val[2]);
+                tb = (int) (0.299 * in.val[0]) +
+                           (0.587 * in.val[1]) +
+                           (0.114 * in.val[2]);
+
+                // If they are over max value, set to max
+                if(tr > 255){ r = 255; } else { r = tr; }   
+                if(tg > 255){ g = 255; } else { g = tg; }   
+                if(tb > 255){ b = 255; } else { b = tb; }   
+
+                out.val[0] = r;
+                out.val[1] = g;
+                out.val[2] = b;
+                    }
+        }   
+            outputVideo.write(copyFrame);
+    }
+}
 int main(int argc, char *argv[])
 {
     help();
@@ -264,9 +518,56 @@ int main(int argc, char *argv[])
 		    cout << "Bad input, see usage" << endl;
 		    return 0;
 		}
+    }
+        else if(Command=="watermark"){
+            if(processing=="-serial")
+                watermark_s(inputVideo, outputVideo, watermark_img_file);
+            else if(processing=="-parallel")
+                watermark_p(inputVideo, outputVideo, watermark_img_file);
+            else{
+                inputVideo.release();
+                outputVideo.release();
+                cout << "Bad input, see usage" << endl;
+                return 0;
+        }
+    }
 
+    else if(Command=="bw"){
+            if(processing=="-serial")
+                bw_s(inputVideo, outputVideo);
+            else if(processing=="-parallel")
+                bw_p(inputVideo, outputVideo);
+            else{
+                inputVideo.release();
+                outputVideo.release();
+                cout << "Bad input, see usage" << endl;
+                return 0;
+        }
+    }
 
-     
+    else if(Command=="negative"){
+            if(processing=="-serial")
+                negative_s(inputVideo, outputVideo);
+            else if(processing=="-parallel")
+                negative_p(inputVideo, outputVideo);
+            else{
+                inputVideo.release();
+                outputVideo.release();
+                cout << "Bad input, see usage" << endl;
+                return 0;
+        }
+    }
+    else if(Command=="sepia"){
+            if(processing=="-serial")
+                sepia_s(inputVideo, outputVideo);
+            else if(processing=="-parallel")
+                sepia_p(inputVideo, outputVideo);
+            else{
+                inputVideo.release();
+                outputVideo.release();
+                cout << "Bad input, see usage" << endl;
+                return 0;
+        }
     }
     else{
         	inputVideo.release();
