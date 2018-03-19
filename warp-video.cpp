@@ -132,6 +132,53 @@ void self_overlay_p(VideoCapture inputVideo, VideoWriter outputVideo){
         }
 
 }
+void darken_s(VideoCapture inputVideo, VideoWriter outputVideo){
+	cout<<"Darkening...."<<endl;
+        for(;;) 
+            {
+            Mat frame;
+            inputVideo >> frame; // get a new frame from camera
+            Mat cframe=frame.clone();
+            if (frame.empty()) break; 
+
+            for (int i = 0; i < cframe.cols; i++) {
+                for (int j = 0; j < cframe.rows; j++) {
+                    Vec3b &intensity = frame.at<Vec3b>(j, i);
+                    Vec3b &inverse = cframe.at<Vec3b>(j, i);
+                    intensity.val[0] = inverse.val[0]>>1;
+                    intensity.val[1] = inverse.val[1]>>1;
+                    intensity.val[2] = inverse.val[2]>>1;
+    
+                }
+            }
+           outputVideo.write(frame);
+        }
+
+}
+void darken_p(VideoCapture inputVideo, VideoWriter outputVideo){
+	cout<<"Darkening...."<<endl;
+		#pragma omp parallel for
+        for(;;) 
+            {
+            Mat frame;
+            inputVideo >> frame; // get a new frame from camera
+            Mat cframe=frame.clone();
+            if (frame.empty()) break; 
+            #pragma omp parallel for
+            for (int i = 0; i < cframe.cols; i++) {
+                for (int j = 0; j < cframe.rows; j++) {
+                    Vec3b &intensity = frame.at<Vec3b>(j, i);
+                    Vec3b &inverse = cframe.at<Vec3b>(j, i);
+                    intensity.val[0] = inverse.val[0]>>1;
+                    intensity.val[1] = inverse.val[1]>>1;
+                    intensity.val[2] = inverse.val[2]>>1;
+    
+                }
+            }
+           outputVideo.write(frame);
+        }
+
+}
 
 int main(int argc, char *argv[])
 {
@@ -199,6 +246,27 @@ int main(int argc, char *argv[])
         	self_overlay_s(inputVideo, outputVideo);
         else if(processing=="-parallel")
         	self_overlay_p(inputVideo, outputVideo);
+        else{
+        	inputVideo.release();
+		    outputVideo.release();
+		    cout << "Bad input, see usage" << endl;
+		    return 0;
+		}
+    }
+      else if(Command=="darken"){
+      	if(processing=="-serial")
+        	darken_s(inputVideo, outputVideo);
+        else if(processing=="-parallel")
+        	darken_p(inputVideo, outputVideo);
+        else{
+        	inputVideo.release();
+		    outputVideo.release();
+		    cout << "Bad input, see usage" << endl;
+		    return 0;
+		}
+
+
+     
     }
     else{
         	inputVideo.release();
