@@ -6,6 +6,16 @@ The user will need to download openCV. Here is a tutorial: https://milq.github.i
 Follow these steps to ensure OpenCV is installed correctly.
 I recommend using the demo file on the site, it's very helpful.
 
+The repo includes the following files:
+	5 avi files for video test (bird.avi, cbw3.avi, color.AVI, drop.avi, flame.avi)
+	watermark.jpg (a test image for the watermark filter)
+	Makefile
+	warp_serial.cpp (our serial implementation of the project)
+	warp-video.cpp (both serial and parallel implementation of the project)
+	.gitignore (to ignore .DS_Store)
+	A PDF for our project report
+	This README
+
 Available commands for the program are:
 invert, self_overlay, darken, watermark, bw, negative, blur
 
