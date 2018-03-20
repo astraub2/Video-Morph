@@ -25,7 +25,7 @@ static void help()
         << "Usage:"                                                                         << endl
         << "./video-write inputvideoName <command> <-serial OR -parallel>"                              << endl
         << "------------------------------------------------------------------------------" << endl
-        << "Available commands: invert, bw, sepia, watermark, darken, self_overlay" << endl
+        << "Available commands: invert, bw, watermark, darken, self_overlay" << endl
         << "./video-write inputvideoName <command> <-serial OR -parallel> watermarkimage"                              << endl
 
         << endl;
@@ -361,6 +361,7 @@ void negative_p(Mat* frames_temp, Mat* newframes_temp, int NUMFRAMES) {
     }
 }
 
+/* The sepia filter is a work in progress.
 void sepia_s(VideoCapture inputVideo, VideoWriter outputVideo) {
     cout << "Sepia..." << endl;
     Mat frame;
@@ -460,7 +461,7 @@ void sepia_p(Mat* frames_temp, Mat* newframes_temp, int NUMFRAMES) {
             newframes_temp[i]=copyFrame;
     }
 }
-
+*/
 void blur_s(VideoCapture inputVideo, VideoWriter outputVideo) {
     cout<<"Blurry...."<<endl;
 
@@ -583,8 +584,6 @@ int main(int argc, char *argv[])
             bw_s(inputVideo, outputVideo);
         else if(Command=="negative")
             negative_s(inputVideo, outputVideo);
-        else if(Command=="sepia")
-            sepia_s(inputVideo, outputVideo);
         else if(Command=="blur")
             blur_s(inputVideo, outputVideo);
         else{
@@ -631,9 +630,6 @@ int main(int argc, char *argv[])
         }
         else if(Command=="negative"){
             negative_p(frames_temp, newframes_temp, NUMFRAMES); 
-        }
-        else if(Command=="sepia"){
-            sepia_p(frames_temp, newframes_temp, NUMFRAMES);    
         }
         else if(Command=="blur"){
             blur_p(frames_temp, newframes_temp, NUMFRAMES);    
