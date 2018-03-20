@@ -69,6 +69,7 @@ void invert_p(VideoCapture inputVideo, VideoWriter outputVideo, int NUMFRAMES){
         }
 
         cout<<"Inverting...."<<endl;
+        #pragma omp parallel for
         for(int i=0;i<NUMFRAMES; i++) 
             {
             Mat frame=frames_temp[i];
