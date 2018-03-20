@@ -146,23 +146,26 @@ int main(int argc, char *argv[])
 			inputVideo >> frame;
 			copyFrame = frame;
 			if(frame.empty()) break;
+			
 			for (int i = 0; i < frame.rows; i++) {
-	        	for (int j = 0; j < frame.cols; j++) {
-    	    		Vec3b &inputPixel = frame.at<Vec3b>(i, j);
-        	        Vec3b &outputPixel = copyFrame.at<Vec3b>(i, j);
+	        		for (int j = 0; j < frame.cols; j++) {
+    	    			Vec3b &inputPixel = frame.at<Vec3b>(i, j);
+	        	        Vec3b &outputPixel = copyFrame.at<Vec3b>(i, j);
 	                
     				//Create luminosity value
-	    			luminosity = (rconst * inputPixel.val[0] + gconst * inputPixel.val[1] + bconst * inputPixel.val[2]);
-					outputPixel.val[0] = luminosity;
-					outputPixel.val[1] = luminosity;
-					outputPixel.val[2] = luminosity;
-        		}
+	    			luminosity = (rconst * inputPixel.val[0] +
+					      gconst * inputPixel.val[1] + 
+					      bconst * inputPixel.val[2]);
+				outputPixel.val[0] = luminosity;
+				outputPixel.val[1] = luminosity;
+				outputPixel.val[2] = luminosity;
+        			}
 			}	
-	        outputVideo.write(copyFrame);
+	        	outputVideo.write(copyFrame);
 		}
+
 		auto stop = Clock::now();
-    	std::cout << "Timer: " << std::chrono::duration_cast<std::chrono::milliseconds>(stop - start).count()
-      			  << " milliseconds\n";
+  		std::cout << "Timer: " << std::chrono::duration_cast<std::chrono::milliseconds>(stop - start).count() << " milliseconds\n";
 
    	} else if (Command == "negative"){
 		cout << "Negative..." << endl;
