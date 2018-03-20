@@ -28,33 +28,6 @@ static void help()
         << endl;
 }
 
-void invert_p(VideoCapture inputVideo, VideoWriter outputVideo){
-
-        cout<<"Inverting...."<<endl;
-        #pragma omp parallel for
-        for(;;) 
-            {
-            Mat frame;
-            inputVideo >> frame; // get a new frame from camera
-            Mat cframe=frame.clone();
-            
-            if (frame.empty()) break; 
-
-            uchar pixValue;
-            #pragma omp parallel for
-            for (int i = 0; i < cframe.cols; i++) {
-                for (int j = 0; j < cframe.rows; j++) {
-                    Vec3b &intensity = frame.at<Vec3b>(j, i);
-                    Vec3b &inverse = cframe.at<Vec3b>(cframe.rows-j, cframe.cols-i);
-                    intensity.val[0] = inverse.val[0];
-                    intensity.val[1] = inverse.val[1];
-                    intensity.val[2] = inverse.val[2];
-    
-               }
-            }
-           outputVideo.write(frame);
-        }
-}
 void invert_s(VideoCapture inputVideo, VideoWriter outputVideo){
 
         cout<<"Inverting...."<<endl;
@@ -80,6 +53,34 @@ void invert_s(VideoCapture inputVideo, VideoWriter outputVideo){
            outputVideo.write(frame);
         }
 }
+void invert_p(VideoCapture inputVideo, VideoWriter outputVideo){
+
+        cout<<"Inverting...."<<endl;
+        for(;;) 
+            {
+            Mat frame;
+            inputVideo >> frame; // get a new frame from camera
+            Mat cframe=frame.clone();
+            
+            if (frame.empty()) break; 
+            int chunk_size = frame.cols/4;
+            uchar pixValue;
+            #pragma omp parallel for
+            for (int i = 0; i < cframe.cols; i++) {
+                #pragma omp for nowait, schedule(dynamic, chunk_size)
+                for (int j = 0; j < cframe.rows; j++) {
+                    Vec3b &intensity = frame.at<Vec3b>(j, i);
+                    Vec3b &inverse = cframe.at<Vec3b>(cframe.rows-j, cframe.cols-i);
+                    intensity.val[0] = inverse.val[0];
+                    intensity.val[1] = inverse.val[1];
+                    intensity.val[2] = inverse.val[2];
+    
+               }
+            }
+           outputVideo.write(frame);
+        }
+}
+
 void self_overlay_s(VideoCapture inputVideo, VideoWriter outputVideo){
 	 cout<<"Overlaying...."<<endl;
         for(;;) 
@@ -107,16 +108,17 @@ void self_overlay_s(VideoCapture inputVideo, VideoWriter outputVideo){
 }
 void self_overlay_p(VideoCapture inputVideo, VideoWriter outputVideo){
 	 cout<<"Overlaying...."<<endl;
-        #pragma omp parallel for
         for(;;) 
             {
             Mat frame;
             inputVideo >> frame; // get a new frame from camera
             Mat cframe=frame.clone();
             double opacity = .5;
+            int chunk_size = cframe.rows/4;
             if (frame.empty()) break; 
             #pragma omp parallel for
             for (int i = 0; i < cframe.cols; i++) {
+                #pragma omp for nowait, schedule(dynamic, chunk_size)
                 for (int j = 0; j < cframe.rows; j++) {
                     Vec3b &intensity = frame.at<Vec3b>(j, i);
                     Vec3b &inverse = cframe.at<Vec3b>(cframe.rows-j, cframe.cols-i);
@@ -157,15 +159,16 @@ void darken_s(VideoCapture inputVideo, VideoWriter outputVideo){
 }
 void darken_p(VideoCapture inputVideo, VideoWriter outputVideo){
 	cout<<"Darkening...."<<endl;
-		#pragma omp parallel for
         for(;;) 
             {
             Mat frame;
             inputVideo >> frame; // get a new frame from camera
             Mat cframe=frame.clone();
             if (frame.empty()) break; 
+            int chunk_size = cframe.rows/4;
             #pragma omp parallel for
             for (int i = 0; i < cframe.cols; i++) {
+                #pragma omp for nowait, schedule(dynamic, chunk_size)
                 for (int j = 0; j < cframe.rows; j++) {
                     Vec3b &intensity = frame.at<Vec3b>(j, i);
                     Vec3b &inverse = cframe.at<Vec3b>(j, i);
@@ -252,7 +255,7 @@ void bw_s(VideoCapture inputVideo, VideoWriter outputVideo) {
                         Vec3b &outputPixel = copyFrame.at<Vec3b>(i, j);
                     
                     //Create luminosity value
-                    luminosity = (rconst * inputPixel.val[0] + gconst * inputPixel.val[1] + bconst * inputPixel.val[2]);
+                luminosity = (rconst * inputPixel.val[0] + gconst * inputPixel.val[1] + bconst * inputPixel.val[2]);
                 outputPixel.val[0] = luminosity;
                 outputPixel.val[1] = luminosity;
                 outputPixel.val[2] = luminosity;
@@ -276,8 +279,10 @@ void bw_p(VideoCapture inputVideo, VideoWriter outputVideo) {
         inputVideo >> frame;
         copyFrame = frame;
         if(frame.empty()) break;
+        int chunk_size = frame.cols/4;
         #pragma omp parallel for
         for (int i = 0; i < frame.rows; i++) {
+                #pragma omp for nowait, schedule(dynamic, chunk_size)
                 for (int j = 0; j < frame.cols; j++) {
                         Vec3b &inputPixel = frame.at<Vec3b>(i, j);
                         Vec3b &outputPixel = copyFrame.at<Vec3b>(i, j);
@@ -327,8 +332,10 @@ void negative_p(VideoCapture inputVideo, VideoWriter outputVideo) {
         inputVideo >> frame;
         copyFrame = frame;
         if(frame.empty()) break;
+        int chunk_size = frame.cols/4;
         #pragma omp parallel for
         for (int i = 0; i < frame.rows; i++) {
+                #pragma omp for nowait, schedule(dynamic, chunk_size)
                 for (int j = 0; j < frame.cols; j++) {
                     Vec3b &inputPixel = frame.at<Vec3b>(i, j);
                     Vec3b &outputPixel = copyFrame.at<Vec3b>(i, j);
@@ -407,8 +414,10 @@ void sepia_p(VideoCapture inputVideo, VideoWriter outputVideo) {
         inputVideo >> frame;
         copyFrame = frame;
         if(frame.empty()) break;
+        int chunk_size = frame.cols/4;
         #pragma omp parallel for
         for (int i = 0; i < frame.rows; i++) {
+                #pragma omp for nowait, schedule(dynamic, chunk_size)
                 for (int j = 0; j < frame.cols; j++) {
                         Vec3b &in = frame.at<Vec3b>(i, j);
                         Vec3b &out = copyFrame.at<Vec3b>(i, j);
@@ -437,6 +446,57 @@ void sepia_p(VideoCapture inputVideo, VideoWriter outputVideo) {
             outputVideo.write(copyFrame);
     }
 }
+
+void blur_s(VideoCapture inputVideo, VideoWriter outputVideo) {
+    cout<<"Blurry...."<<endl;
+
+        auto start = Clock::now();
+        Mat frame;
+        Mat copyFrame;
+        for(;;) 
+            {
+            inputVideo >> frame;
+            copyFrame = frame;
+            if (frame.empty()) break; 
+
+            uchar pixValue;
+
+            for ( int i = 1; i < 31; i = i + 2 ) {
+                GaussianBlur( copyFrame, frame, Size( i, i ), 0, 0 );
+            }
+
+            outputVideo.write(frame);
+        }
+        auto stop = Clock::now();
+        std::cout << "Timer: " << std::chrono::duration_cast<std::chrono::milliseconds>(stop - start).count()
+                  << " milliseconds\n";
+}
+
+void blur_p(VideoCapture inputVideo, VideoWriter outputVideo) {
+    cout<<"Blurry...."<<endl;
+
+        auto start = Clock::now();
+        Mat frame;
+        Mat copyFrame;
+        for(;;) 
+            {
+            inputVideo >> frame;
+            copyFrame = frame;
+            if (frame.empty()) break; 
+
+            uchar pixValue;
+
+            for ( int i = 1; i < 31; i = i + 2 ) {
+                GaussianBlur( copyFrame, frame, Size( i, i ), 0, 0 );
+            }
+
+            outputVideo.write(frame);
+        }
+        auto stop = Clock::now();
+        std::cout << "Timer: " << std::chrono::duration_cast<std::chrono::milliseconds>(stop - start).count()
+                  << " milliseconds\n";
+}
+
 int main(int argc, char *argv[])
 {
     help();
