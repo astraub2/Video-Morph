@@ -25,7 +25,7 @@ static void help()
         << "Usage:"                                                                         << endl
         << "./video-write inputvideoName <command>"                              << endl
         << "------------------------------------------------------------------------------" << endl
-        << "Available commands: invert, bw, sepia, watermark, darken, self_overlay" << endl
+        << "Available commands: invert, bw, watermark, darken, self_overlay" << endl
         << "./video-write inputvideoName <command> watermarkimage"                              << endl
 
         << endl;

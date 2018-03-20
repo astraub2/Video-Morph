@@ -25,7 +25,8 @@ static void help()
         << "Usage:"                                                                         << endl
         << "./video-write inputvideoName <command> <-serial OR -parallel>"                              << endl
         << "------------------------------------------------------------------------------" << endl
-        << "Available commands: invert, bw, watermark, darken, self_overlay" << endl
+        << "Available commands: invert, self_overlay, darken, watermark, bw, negative, blur
+" << endl
         << "./video-write inputvideoName <command> <-serial OR -parallel> watermarkimage"                              << endl
 
         << endl;
