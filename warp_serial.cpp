@@ -1,3 +1,5 @@
+#include <chrono>
+
 #include <iostream> // for standard I/O
 #include <string>   // for strings
 
@@ -13,6 +15,7 @@ typedef std::chrono::high_resolution_clock Clock;
 using namespace std;
 using namespace cv;
 //WITH_FFMPEG=ON
+typedef std::chrono::high_resolution_clock Clock;
 static void help()
 {
     cout
@@ -62,7 +65,7 @@ int main(int argc, char *argv[])
                   (int) inputVideo.get(CV_CAP_PROP_FRAME_HEIGHT));
 
     VideoWriter outputVideo;                                        // Open the output
-    outputVideo.open(NAME, ex=0, inputVideo.get(CV_CAP_PROP_FPS)*.5, S, true);
+    outputVideo.open(NAME, ex=0, inputVideo.get(CV_CAP_PROP_FPS), S, true);
     
     if (!outputVideo.isOpened())
     {
@@ -72,7 +75,6 @@ int main(int argc, char *argv[])
 
     cout << "Input frame resolution: Width=" << S.width << "  Height=" << S.height
          << " of nr#: " << inputVideo.get(CV_CAP_PROP_FRAME_COUNT) << endl;
-    
 
     if(Command=="invert"){
     	cout<<"Inverting...."<<endl;
@@ -82,8 +84,8 @@ int main(int argc, char *argv[])
         	{
 	        Mat frame;
 	        inputVideo >> frame; // get a new frame from camera
-	        Mat cframe;
-	        inputVideo >> cframe;
+	        Mat cframe=frame.clone();
+	        
 	        if (frame.empty()) break; 
 
 	        uchar pixValue;
@@ -281,8 +283,7 @@ int main(int argc, char *argv[])
             {
             Mat frame;
             inputVideo >> frame; // get a new frame from camera
-            Mat cframe;
-            inputVideo >> cframe;
+            Mat cframe=frame.clone();
             if (frame.empty()) break; 
 
             for (int i = 0; i < cframe.cols; i++) {
@@ -309,8 +310,8 @@ int main(int argc, char *argv[])
             {
             Mat frame;
             inputVideo >> frame; // get a new frame from camera
-            Mat cframe;
-            inputVideo >> cframe;
+            Mat cframe=frame.clone();
+            double opacity = .5;
             if (frame.empty()) break; 
 
             for (int i = 0; i < cframe.cols; i+=2) {
@@ -429,7 +430,7 @@ int main(int argc, char *argv[])
     	std::cout << "Timer: " << std::chrono::duration_cast<std::chrono::milliseconds>(stop - start).count()
       			  << " milliseconds\n";
 
-    }	
+    }
 
     inputVideo.release();
     outputVideo.release();
