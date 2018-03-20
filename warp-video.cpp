@@ -591,8 +591,12 @@ int main(int argc, char *argv[])
     << " milliseconds" << std::endl;
     }
     if(processing=="-parallel"){
-        Mat frames_temp[NUMFRAMES];
-        Mat newframes_temp[NUMFRAMES];  
+        // Mat frames_temp[NUMFRAMES];
+        // Mat newframes_temp[NUMFRAMES];  
+        Mat* frames_temp;
+        frames_temp= new Mat[NUMFRAMES];
+        Mat* newframes_temp;
+        newframes_temp= new Mat[NUMFRAMES];
         for(int i=0;i<NUMFRAMES; i++) 
             {
             Mat frame;
