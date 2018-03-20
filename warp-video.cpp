@@ -113,9 +113,8 @@ void self_overlay_s(VideoCapture inputVideo, VideoWriter outputVideo){
 }
 void self_overlay_p(Mat* frames_temp, Mat* newframes_temp, int NUMFRAMES){
      cout<<"Overlaying...."<<endl;
-
+     	#pragma omp parallel for
         for(int i=0;i<NUMFRAMES; i++) 
-            #pragma omp parallel for
             {
             Mat frame=frames_temp[i];
             Mat cframe=frame.clone();
