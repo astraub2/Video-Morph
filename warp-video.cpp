@@ -1,4 +1,4 @@
-   #include <chrono>
+#include <chrono>
 
 #include <iostream> // for standard I/O
 #include <string>   // for strings
@@ -457,7 +457,7 @@ void sepia_p(Mat* frames_temp, Mat* newframes_temp, int NUMFRAMES) {
                 out.val[2] = b;
                     }
         }   
-            newframes_temp[i]=frame;
+            newframes_temp[i]=copyFrame;
     }
 }
 
