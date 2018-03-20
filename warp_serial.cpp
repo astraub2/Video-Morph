@@ -339,7 +339,10 @@ int main(int argc, char *argv[])
     	std::cout << "Timer: " << std::chrono::duration_cast<std::chrono::milliseconds>(stop - start).count()
       			  << " milliseconds\n";
 
-    } else if(Command == "andy"){
+    } /* This filter is a work in progress. We want to make the video
+    an Andy Warhol style distortion (4 images )
+
+    else if(Command == "andy"){
     
         cout << "Making art...." << endl;
 
@@ -430,7 +433,7 @@ int main(int argc, char *argv[])
     	std::cout << "Timer: " << std::chrono::duration_cast<std::chrono::milliseconds>(stop - start).count()
       			  << " milliseconds\n";
 
-    }
+    }*/
 
     inputVideo.release();
     outputVideo.release();

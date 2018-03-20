@@ -180,7 +180,7 @@ void darken_p(VideoCapture inputVideo, VideoWriter outputVideo){
 
 }
 
-void watermark_s(VideoCapture inputVideo, VideoWriter outputVideo, watermark_img_file) {
+void watermark_s(VideoCapture inputVideo, VideoWriter outputVideo, string& watermark_img_file) {
     cout<<"Adding watermark..."<<endl;
         Mat wframe = imread(watermark_img_file);
         double opacity = .25;
@@ -205,11 +205,12 @@ void watermark_s(VideoCapture inputVideo, VideoWriter outputVideo, watermark_img
         }
 }
 
-void watermark_p(VideoCapture inputVideo, VideoWriter outputVideo, watermark_img_file) {
+void watermark_p(VideoCapture inputVideo, VideoWriter outputVideo, string& watermark_img_file) {
     cout<<"Adding watermark..."<<endl;
         Mat wframe = imread(watermark_img_file);
         double opacity = .25;
         int offset = 100;
+        int chunk_size = wframe.cols/4;
         for(;;){
             Mat frame;
             inputVideo >> frame; // get a new frame from camera
@@ -217,6 +218,7 @@ void watermark_p(VideoCapture inputVideo, VideoWriter outputVideo, watermark_img
             if (frame.empty()) break; 
             #pragma omp parallel for
             for (int i = 0; i < wframe.rows; i++) {
+                #pragma omp for nowait, schedule(dynamic, chunk_size)
                 for (int j = 0; j < wframe.cols; j++) {
                     Vec3b &intensity = frame.at<Vec3b>(i+offset, j+offset);
                     Vec3b &watermark = wframe.at<Vec3b>(i, j);
@@ -405,6 +407,7 @@ void sepia_p(VideoCapture inputVideo, VideoWriter outputVideo) {
         inputVideo >> frame;
         copyFrame = frame;
         if(frame.empty()) break;
+        #pragma omp parallel for
         for (int i = 0; i < frame.rows; i++) {
                 for (int j = 0; j < frame.cols; j++) {
                         Vec3b &in = frame.at<Vec3b>(i, j);
