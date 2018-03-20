@@ -87,7 +87,7 @@ void invert_p(Mat* frames_temp, Mat* newframes_temp, int NUMFRAMES){
 }
 
 void self_overlay_s(VideoCapture inputVideo, VideoWriter outputVideo){
-	 cout<<"Overlaying...."<<endl;
+     cout<<"Overlaying...."<<endl;
         for(;;) 
             {
             Mat frame;
@@ -111,19 +111,8 @@ void self_overlay_s(VideoCapture inputVideo, VideoWriter outputVideo){
         }
 
 }
-void self_overlay_p(VideoCapture inputVideo, VideoWriter outputVideo, int NUMFRAMES){
-    Mat frames_temp[NUMFRAMES];
-    Mat newframes_temp[NUMFRAMES];
-        
-    for(int i=0;i<NUMFRAMES; i++) 
-        {
-        Mat frame;
-        inputVideo >> frame; // get a new frame from camera
-        if (frame.empty()) break; 
-        frames_temp[i]=frame;
-    }
-
-	 cout<<"Overlaying...."<<endl;
+void self_overlay_p(Mat* frames_temp, Mat* newframes_temp, int NUMFRAMES){
+     cout<<"Overlaying...."<<endl;
 
         for(int i=0;i<NUMFRAMES; i++) 
             #pragma omp parallel for
@@ -148,18 +137,10 @@ void self_overlay_p(VideoCapture inputVideo, VideoWriter outputVideo, int NUMFRA
             }
             newframes_temp[i]=frame;
         }
-        for(int i=0;i<NUMFRAMES; i++) 
-            {
-            Mat frame=newframes_temp[i];
-            if (frame.empty()) break; 
-
-            outputVideo.write(frame);
-            
-        }
 
 }
 void darken_s(VideoCapture inputVideo, VideoWriter outputVideo){
-	cout<<"Darkening...."<<endl;
+    cout<<"Darkening...."<<endl;
         for(;;) 
             {
             Mat frame;
@@ -181,23 +162,13 @@ void darken_s(VideoCapture inputVideo, VideoWriter outputVideo){
         }
 
 }
-void darken_p(VideoCapture inputVideo, VideoWriter outputVideo, int NUMFRAMES){
-    Mat frames_temp[NUMFRAMES];
-    Mat newframes_temp[NUMFRAMES];
-        
-    for(int i=0;i<NUMFRAMES; i++) 
-        {
-        Mat frame;
-        inputVideo >> frame; // get a new frame from camera
-        if (frame.empty()) break; 
-        frames_temp[i]=frame;
-    }
-
-	cout<<"Darkening...."<<endl;
-        for(;;) 
+void darken_p(Mat* frames_temp, Mat* newframes_temp, int NUMFRAMES){
+    
+    cout<<"Darkening...."<<endl;
+        for(int i=0;i<NUMFRAMES; i++) 
+            #pragma omp parallel for
             {
-            Mat frame;
-            inputVideo >> frame; // get a new frame from camera
+            Mat frame=frames_temp[i];
             Mat cframe=frame.clone();
             if (frame.empty()) break; 
             int chunk_size = cframe.rows/4;
@@ -213,7 +184,7 @@ void darken_p(VideoCapture inputVideo, VideoWriter outputVideo, int NUMFRAMES){
     
                 }
             }
-           outputVideo.write(frame);
+          newframes_temp[i]=frame;
         }
 
 }
@@ -226,6 +197,7 @@ void watermark_s(VideoCapture inputVideo, VideoWriter outputVideo, string& water
         for(;;){
             Mat frame;
             inputVideo >> frame; // get a new frame from camera
+            Mat copyframe=frame.clone();
             
             if (frame.empty()) break; 
 
@@ -243,27 +215,17 @@ void watermark_s(VideoCapture inputVideo, VideoWriter outputVideo, string& water
         }
 }
 
-void watermark_p(VideoCapture inputVideo, VideoWriter outputVideo, string& watermark_img_file, int NUMFRAMES) {
-    Mat frames_temp[NUMFRAMES];
-    Mat newframes_temp[NUMFRAMES];
-        
-    for(int i=0;i<NUMFRAMES; i++) 
-        {
-        Mat frame;
-        inputVideo >> frame; // get a new frame from camera
-        if (frame.empty()) break; 
-        frames_temp[i]=frame;
-    }
-
+void watermark_p(Mat* frames_temp, Mat* newframes_temp, int NUMFRAMES, string& watermark_img_file) {
     cout<<"Adding watermark..."<<endl;
         Mat wframe = imread(watermark_img_file);
         double opacity = .25;
         int offset = 100;
-        int chunk_size = wframe.cols/4;
-        for(;;){
-            Mat frame;
-            inputVideo >> frame; // get a new frame from camera
-            
+        
+        for(int i=0;i<NUMFRAMES; i++) 
+            #pragma omp parallel for
+            {
+            Mat frame=frames_temp[i];
+            int chunk_size = frame.cols/4;
             if (frame.empty()) break; 
             #pragma omp parallel for
             for (int i = 0; i < wframe.rows; i++) {
@@ -277,7 +239,7 @@ void watermark_p(VideoCapture inputVideo, VideoWriter outputVideo, string& water
         
                 }
             }
-           outputVideo.write(frame);
+           newframes_temp[i]=frame;
         }
 }
 
@@ -311,30 +273,23 @@ void bw_s(VideoCapture inputVideo, VideoWriter outputVideo) {
     }
 }
 
-void bw_p(VideoCapture inputVideo, VideoWriter outputVideo, int NUMFRAMES) {
-    Mat frames_temp[NUMFRAMES];
-    Mat newframes_temp[NUMFRAMES];
-        
-    for(int i=0;i<NUMFRAMES; i++) 
-        {
-        Mat frame;
-        inputVideo >> frame; // get a new frame from camera
-        if (frame.empty()) break; 
-        frames_temp[i]=frame;
-    }
-
+void bw_p(Mat* frames_temp, Mat* newframes_temp, int NUMFRAMES) {
+    
     cout << "Black and Whiting..." << endl;
-    Mat frame;
-    Mat copyFrame;
+    
     uchar pixValue;
     float rconst = 0.2125;
     float gconst = 0.7154;
     float bconst = 0.0721;
     char luminosity;
 
-    for(;;){
-        inputVideo >> frame;
-        copyFrame = frame;
+    for(int i=0;i<NUMFRAMES; i++) 
+        #pragma omp parallel for
+        {
+        Mat frame=frames_temp[i];
+        Mat copyFrame=frame.clone();
+
+            
         if(frame.empty()) break;
         int chunk_size = frame.cols/4;
         #pragma omp parallel for
@@ -351,19 +306,20 @@ void bw_p(VideoCapture inputVideo, VideoWriter outputVideo, int NUMFRAMES) {
                 outputPixel.val[2] = luminosity;
                     }
         }   
-            outputVideo.write(copyFrame);
+            newframes_temp[i]=frame;
     }
 }
 
 void negative_s(VideoCapture inputVideo, VideoWriter outputVideo) {
     cout << "Negative..." << endl;
+    
+    uchar pixValue;
     Mat frame;
     Mat copyFrame;
-    uchar pixValue;
 
     for(;;){
         inputVideo >> frame;
-        copyFrame = frame;
+        Mat copyFrame=frame.clone();
         if(frame.empty()) break;
         for (int i = 0; i < frame.rows; i++) {
                 for (int j = 0; j < frame.cols; j++) {
@@ -379,27 +335,14 @@ void negative_s(VideoCapture inputVideo, VideoWriter outputVideo) {
     }
 }
 
-void negative_p(VideoCapture inputVideo, VideoWriter outputVideo, int NUMFRAMES) {
+void negative_p(Mat* frames_temp, Mat* newframes_temp, int NUMFRAMES) {
 
-    Mat frames_temp[NUMFRAMES];
-    Mat newframes_temp[NUMFRAMES];
-        
     for(int i=0;i<NUMFRAMES; i++) 
+        #pragma omp parallel for
         {
-        Mat frame;
-        inputVideo >> frame; // get a new frame from camera
-        if (frame.empty()) break; 
-        frames_temp[i]=frame;
-    }
-
-    cout << "Negative..." << endl;
-    Mat frame;
-    Mat copyFrame;
-    uchar pixValue;
-
-    for(;;){
-        inputVideo >> frame;
-        copyFrame = frame;
+        Mat frame=frames_temp[i];
+        Mat copyFrame=frame.clone();
+           
         if(frame.empty()) break;
         int chunk_size = frame.cols/4;
         #pragma omp parallel for
@@ -414,7 +357,7 @@ void negative_p(VideoCapture inputVideo, VideoWriter outputVideo, int NUMFRAMES)
                     outputPixel.val[2] = 255 - inputPixel.val[2];
                 }
         }   
-            outputVideo.write(copyFrame);
+            newframes_temp[i]=frame;
     }
 }
 
@@ -466,21 +409,10 @@ void sepia_s(VideoCapture inputVideo, VideoWriter outputVideo) {
     }
 }
 
-void sepia_p(VideoCapture inputVideo, VideoWriter outputVideo, int NUMFRAMES) {
-    Mat frames_temp[NUMFRAMES];
-    Mat newframes_temp[NUMFRAMES];
-        
-    for(int i=0;i<NUMFRAMES; i++) 
-        {
-        Mat frame;
-        inputVideo >> frame; // get a new frame from camera
-        if (frame.empty()) break; 
-        frames_temp[i]=frame;
-    }
+void sepia_p(Mat* frames_temp, Mat* newframes_temp, int NUMFRAMES) {
 
     cout << "Sepia..." << endl;
-    Mat frame;
-    Mat copyFrame;
+    
     uchar pixValue;
 
     int tr;
@@ -490,9 +422,11 @@ void sepia_p(VideoCapture inputVideo, VideoWriter outputVideo, int NUMFRAMES) {
     int g;
     int b;
 
-    for(;;){
-        inputVideo >> frame;
-        copyFrame = frame;
+    for(int i=0;i<NUMFRAMES; i++) 
+        #pragma omp parallel for
+        {
+        Mat frame=frames_temp[i];
+        Mat copyFrame=frame.clone();
         if(frame.empty()) break;
         int chunk_size = frame.cols/4;
         #pragma omp parallel for
@@ -523,7 +457,7 @@ void sepia_p(VideoCapture inputVideo, VideoWriter outputVideo, int NUMFRAMES) {
                 out.val[2] = b;
                     }
         }   
-            outputVideo.write(copyFrame);
+            newframes_temp[i]=frame;
     }
 }
 
@@ -552,29 +486,19 @@ void blur_s(VideoCapture inputVideo, VideoWriter outputVideo) {
                   << " milliseconds\n";
 }
 
-void blur_p(VideoCapture inputVideo, VideoWriter outputVideo, int NUMFRAMES) {
-    Mat frames_temp[NUMFRAMES];
-    Mat newframes_temp[NUMFRAMES];
-        
-    for(int i=0;i<NUMFRAMES; i++) 
-        {
-        Mat frame;
-        inputVideo >> frame; // get a new frame from camera
-        if (frame.empty()) break; 
-        frames_temp[i]=frame;
-    }
+void blur_p(Mat* frames_temp, Mat* newframes_temp, int NUMFRAMES) {
 
     cout<<"Blurry...."<<endl;
 
         auto start = Clock::now();
-        Mat frame;
-        Mat copyFrame;
+        
         int kernel = 31;
         int chunk_size = kernel/4;
-        for(;;) 
+        for(int i=0;i<NUMFRAMES; i++) 
+            #pragma omp parallel for
             {
-            inputVideo >> frame;
-            copyFrame = frame;
+            Mat frame=frames_temp[i];
+            Mat copyFrame=frame.clone();
             if (frame.empty()) break; 
 
             uchar pixValue;
@@ -583,7 +507,7 @@ void blur_p(VideoCapture inputVideo, VideoWriter outputVideo, int NUMFRAMES) {
                 GaussianBlur( copyFrame, frame, Size( i, i ), 0, 0 );
             }
 
-            outputVideo.write(frame);
+            newframes_temp[i]=frame;
         }
         auto stop = Clock::now();
         std::cout << "Timer: " << std::chrono::duration_cast<std::chrono::milliseconds>(stop - start).count()
@@ -638,26 +562,38 @@ int main(int argc, char *argv[])
          << " of nr#: " << inputVideo.get(CV_CAP_PROP_FRAME_COUNT) << endl;
     
     
-
+         //sepia
     if(processing=="-serial"){
-    	auto t1 = Clock::now();
-    	if(Command=="invert")
-        	invert_s(inputVideo, outputVideo);
+        auto t1 = Clock::now();
+        if(Command=="invert")
+            invert_s(inputVideo, outputVideo);
+        else if(Command=="self_overlay")
+            self_overlay_s(inputVideo, outputVideo);
+        else if(Command=="darken")
+            darken_s(inputVideo, outputVideo);
+        else if(Command=="watermark")
+            watermark_s(inputVideo, outputVideo, watermark_img_file);
+        else if(Command=="bw")
+            bw_s(inputVideo, outputVideo);
+        else if(Command=="negative")
+            negative_s(inputVideo, outputVideo);
+        else if(Command=="sepia")
+            sepia_s(inputVideo, outputVideo);
         else{
-        	inputVideo.release();
-		    outputVideo.release();
-		    cout << "Bad input, see usage" << endl;
-		    return 0;
-		}
-		auto t2 = Clock::now();
+            inputVideo.release();
+            outputVideo.release();
+            cout << "Bad input, see usage" << endl;
+            return 0;
+        }
+        auto t2 = Clock::now();
     std::cout << "Serial Runtime: "
     << std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count()
     << " milliseconds" << std::endl;
     }
     if(processing=="-parallel"){
-    	Mat frames_temp[NUMFRAMES];
-		Mat newframes_temp[NUMFRAMES];	
-		for(int i=0;i<NUMFRAMES; i++) 
+        Mat frames_temp[NUMFRAMES];
+        Mat newframes_temp[NUMFRAMES];  
+        for(int i=0;i<NUMFRAMES; i++) 
             {
             Mat frame;
             inputVideo >> frame; // get a new frame from camera
@@ -665,17 +601,35 @@ int main(int argc, char *argv[])
             frames_temp[i]=frame;
         }
         auto t1 = Clock::now();
-    	if(Command=="invert"){
-    		invert_p(frames_temp, newframes_temp, NUMFRAMES);
-    		
-    	}
-    	else{
-        	inputVideo.release();
-		    outputVideo.release();
-		    cout << "Bad input, see usage" << endl;
-		    return 0;
-		}
-    	for(int i=0;i<NUMFRAMES; i++) 
+        if(Command=="invert"){
+            invert_p(frames_temp, newframes_temp, NUMFRAMES);
+            
+        }
+        else if(Command=="self_overlay"){
+            self_overlay_p(frames_temp, newframes_temp, NUMFRAMES); 
+        }
+        else if(Command=="darken"){
+            darken_p(frames_temp, newframes_temp, NUMFRAMES);   
+        }
+        else if(Command=="watermark"){
+            watermark_p(frames_temp, newframes_temp, NUMFRAMES, watermark_img_file);    
+        }
+        else if(Command=="bw"){
+            bw_p(frames_temp, newframes_temp, NUMFRAMES);   
+        }
+        else if(Command=="negative"){
+            negative_p(frames_temp, newframes_temp, NUMFRAMES); 
+        }
+        else if(Command=="sepia"){
+            sepia_p(frames_temp, newframes_temp, NUMFRAMES);    
+        }
+        else{
+            inputVideo.release();
+            outputVideo.release();
+            cout << "Bad input, see usage" << endl;
+            return 0;
+        }
+        for(int i=0;i<NUMFRAMES; i++) 
             {
             Mat frame=newframes_temp[i];
             if (frame.empty()) break; 
@@ -686,89 +640,9 @@ int main(int argc, char *argv[])
     std::cout << "Parallel Runtime: "
     << std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count()
     << " milliseconds" << std::endl;
-    	
+        
 
     }
-  //   else if(Command=="self_overlay"){
-  //   	if(processing=="-serial")
-  //       	self_overlay_s(inputVideo, outputVideo);
-  //       else if(processing=="-parallel")
-  //       	self_overlay_p(inputVideo, outputVideo);
-  //       else{
-  //       	inputVideo.release();
-		//     outputVideo.release();
-		//     cout << "Bad input, see usage" << endl;
-		//     return 0;
-		// }
-  //   }
-  //     else if(Command=="darken"){
-  //     	if(processing=="-serial")
-  //       	darken_s(inputVideo, outputVideo);
-  //       else if(processing=="-parallel")
-  //       	darken_p(inputVideo, outputVideo);
-  //       else{
-  //       	inputVideo.release();
-		//     outputVideo.release();
-		//     cout << "Bad input, see usage" << endl;
-		//     return 0;
-		// }
-  //   }
-  //       else if(Command=="watermark"){
-  //           if(processing=="-serial")
-  //               watermark_s(inputVideo, outputVideo, watermark_img_file);
-  //           else if(processing=="-parallel")
-  //               watermark_p(inputVideo, outputVideo, watermark_img_file);
-  //           else{
-  //               inputVideo.release();
-  //               outputVideo.release();
-  //               cout << "Bad input, see usage" << endl;
-  //               return 0;
-  //       }
-  //   }
-
-  //   else if(Command=="bw"){
-  //           if(processing=="-serial")
-  //               bw_s(inputVideo, outputVideo);
-  //           else if(processing=="-parallel")
-  //               bw_p(inputVideo, outputVideo);
-  //           else{
-  //               inputVideo.release();
-  //               outputVideo.release();
-  //               cout << "Bad input, see usage" << endl;
-  //               return 0;
-  //       }
-  //   }
-
-  //   else if(Command=="negative"){
-  //           if(processing=="-serial")
-  //               negative_s(inputVideo, outputVideo);
-  //           else if(processing=="-parallel")
-  //               negative_p(inputVideo, outputVideo);
-  //           else{
-  //               inputVideo.release();
-  //               outputVideo.release();
-  //               cout << "Bad input, see usage" << endl;
-  //               return 0;
-  //       }
-  //   }
-  //   else if(Command=="sepia"){
-  //           if(processing=="-serial")
-  //               sepia_s(inputVideo, outputVideo);
-  //           else if(processing=="-parallel")
-  //               sepia_p(inputVideo, outputVideo);
-  //           else{
-  //               inputVideo.release();
-  //               outputVideo.release();
-  //               cout << "Bad input, see usage" << endl;
-  //               return 0;
-  //       }
-  //   }
-  //   else{
-  //       	inputVideo.release();
-		//     outputVideo.release();
-		//     cout << "Bad input, see usage" << endl;
-		//     return 0;
-		// }
     
 
     inputVideo.release();
