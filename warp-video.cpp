@@ -495,7 +495,7 @@ void blur_p(Mat* frames_temp, Mat* newframes_temp, int NUMFRAMES) {
         
         int kernel = 31;
         int chunk_size = kernel/4;
-        // #pragma omp parallel for
+        #pragma omp parallel for
         for(int i=0;i<NUMFRAMES; i++) 
             {
             Mat frame=frames_temp[i];
