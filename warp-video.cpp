@@ -111,12 +111,24 @@ void self_overlay_s(VideoCapture inputVideo, VideoWriter outputVideo){
         }
 
 }
-void self_overlay_p(VideoCapture inputVideo, VideoWriter outputVideo){
+void self_overlay_p(VideoCapture inputVideo, VideoWriter outputVideo, int NUMFRAMES){
+    Mat frames_temp[NUMFRAMES];
+    Mat newframes_temp[NUMFRAMES];
+        
+    for(int i=0;i<NUMFRAMES; i++) 
+        {
+        Mat frame;
+        inputVideo >> frame; // get a new frame from camera
+        if (frame.empty()) break; 
+        frames_temp[i]=frame;
+    }
+
 	 cout<<"Overlaying...."<<endl;
-        for(;;) 
+
+        for(int i=0;i<NUMFRAMES; i++) 
+            #pragma omp parallel for
             {
-            Mat frame;
-            inputVideo >> frame; // get a new frame from camera
+            Mat frame=frames_temp[i];
             Mat cframe=frame.clone();
             double opacity = .5;
             int chunk_size = cframe.rows/4;
@@ -134,8 +146,15 @@ void self_overlay_p(VideoCapture inputVideo, VideoWriter outputVideo){
     
                 }
             }
+            newframes_temp[i]=frame;
+        }
+        for(int i=0;i<NUMFRAMES; i++) 
+            {
+            Mat frame=newframes_temp[i];
+            if (frame.empty()) break; 
+
+            outputVideo.write(frame);
             
-           outputVideo.write(frame);
         }
 
 }
@@ -162,7 +181,18 @@ void darken_s(VideoCapture inputVideo, VideoWriter outputVideo){
         }
 
 }
-void darken_p(VideoCapture inputVideo, VideoWriter outputVideo){
+void darken_p(VideoCapture inputVideo, VideoWriter outputVideo, int NUMFRAMES){
+    Mat frames_temp[NUMFRAMES];
+    Mat newframes_temp[NUMFRAMES];
+        
+    for(int i=0;i<NUMFRAMES; i++) 
+        {
+        Mat frame;
+        inputVideo >> frame; // get a new frame from camera
+        if (frame.empty()) break; 
+        frames_temp[i]=frame;
+    }
+
 	cout<<"Darkening...."<<endl;
         for(;;) 
             {
@@ -213,7 +243,18 @@ void watermark_s(VideoCapture inputVideo, VideoWriter outputVideo, string& water
         }
 }
 
-void watermark_p(VideoCapture inputVideo, VideoWriter outputVideo, string& watermark_img_file) {
+void watermark_p(VideoCapture inputVideo, VideoWriter outputVideo, string& watermark_img_file, int NUMFRAMES) {
+    Mat frames_temp[NUMFRAMES];
+    Mat newframes_temp[NUMFRAMES];
+        
+    for(int i=0;i<NUMFRAMES; i++) 
+        {
+        Mat frame;
+        inputVideo >> frame; // get a new frame from camera
+        if (frame.empty()) break; 
+        frames_temp[i]=frame;
+    }
+
     cout<<"Adding watermark..."<<endl;
         Mat wframe = imread(watermark_img_file);
         double opacity = .25;
@@ -270,7 +311,18 @@ void bw_s(VideoCapture inputVideo, VideoWriter outputVideo) {
     }
 }
 
-void bw_p(VideoCapture inputVideo, VideoWriter outputVideo) {
+void bw_p(VideoCapture inputVideo, VideoWriter outputVideo, int NUMFRAMES) {
+    Mat frames_temp[NUMFRAMES];
+    Mat newframes_temp[NUMFRAMES];
+        
+    for(int i=0;i<NUMFRAMES; i++) 
+        {
+        Mat frame;
+        inputVideo >> frame; // get a new frame from camera
+        if (frame.empty()) break; 
+        frames_temp[i]=frame;
+    }
+
     cout << "Black and Whiting..." << endl;
     Mat frame;
     Mat copyFrame;
@@ -327,7 +379,19 @@ void negative_s(VideoCapture inputVideo, VideoWriter outputVideo) {
     }
 }
 
-void negative_p(VideoCapture inputVideo, VideoWriter outputVideo) {
+void negative_p(VideoCapture inputVideo, VideoWriter outputVideo, int NUMFRAMES) {
+
+    Mat frames_temp[NUMFRAMES];
+    Mat newframes_temp[NUMFRAMES];
+        
+    for(int i=0;i<NUMFRAMES; i++) 
+        {
+        Mat frame;
+        inputVideo >> frame; // get a new frame from camera
+        if (frame.empty()) break; 
+        frames_temp[i]=frame;
+    }
+
     cout << "Negative..." << endl;
     Mat frame;
     Mat copyFrame;
@@ -402,7 +466,18 @@ void sepia_s(VideoCapture inputVideo, VideoWriter outputVideo) {
     }
 }
 
-void sepia_p(VideoCapture inputVideo, VideoWriter outputVideo) {
+void sepia_p(VideoCapture inputVideo, VideoWriter outputVideo, int NUMFRAMES) {
+    Mat frames_temp[NUMFRAMES];
+    Mat newframes_temp[NUMFRAMES];
+        
+    for(int i=0;i<NUMFRAMES; i++) 
+        {
+        Mat frame;
+        inputVideo >> frame; // get a new frame from camera
+        if (frame.empty()) break; 
+        frames_temp[i]=frame;
+    }
+
     cout << "Sepia..." << endl;
     Mat frame;
     Mat copyFrame;
@@ -477,12 +552,25 @@ void blur_s(VideoCapture inputVideo, VideoWriter outputVideo) {
                   << " milliseconds\n";
 }
 
-void blur_p(VideoCapture inputVideo, VideoWriter outputVideo) {
+void blur_p(VideoCapture inputVideo, VideoWriter outputVideo, int NUMFRAMES) {
+    Mat frames_temp[NUMFRAMES];
+    Mat newframes_temp[NUMFRAMES];
+        
+    for(int i=0;i<NUMFRAMES; i++) 
+        {
+        Mat frame;
+        inputVideo >> frame; // get a new frame from camera
+        if (frame.empty()) break; 
+        frames_temp[i]=frame;
+    }
+
     cout<<"Blurry...."<<endl;
 
         auto start = Clock::now();
         Mat frame;
         Mat copyFrame;
+        int kernel = 31;
+        int chunk_size = kernel/4;
         for(;;) 
             {
             inputVideo >> frame;
@@ -490,8 +578,8 @@ void blur_p(VideoCapture inputVideo, VideoWriter outputVideo) {
             if (frame.empty()) break; 
 
             uchar pixValue;
-
-            for ( int i = 1; i < 31; i = i + 2 ) {
+            #pragma omp for nowait, schedule(dynamic, chunk_size)
+            for ( int i = 1; i < kernel; i = i + 2 ) {
                 GaussianBlur( copyFrame, frame, Size( i, i ), 0, 0 );
             }
 
