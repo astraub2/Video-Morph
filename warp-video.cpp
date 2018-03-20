@@ -11,6 +11,9 @@
 
 using namespace std;
 using namespace cv;
+
+
+
 //WITH_FFMPEG=ON
 typedef std::chrono::high_resolution_clock Clock;
 static void help()
@@ -53,13 +56,23 @@ void invert_s(VideoCapture inputVideo, VideoWriter outputVideo){
            outputVideo.write(frame);
         }
 }
-void invert_p(VideoCapture inputVideo, VideoWriter outputVideo){
-
-        cout<<"Inverting...."<<endl;
-        for(;;) 
+void invert_p(VideoCapture inputVideo, VideoWriter outputVideo, int NUMFRAMES){
+		Mat frames_temp[NUMFRAMES];
+		Mat newframes_temp[NUMFRAMES];
+		
+		for(int i=0;i<NUMFRAMES; i++) 
             {
             Mat frame;
             inputVideo >> frame; // get a new frame from camera
+            if (frame.empty()) break; 
+            frames_temp[i]=frame;
+        }
+
+        cout<<"Inverting...."<<endl;
+        for(int i=0;i<NUMFRAMES; i++) 
+            {
+            Mat frame=frames_temp[i];
+            
             Mat cframe=frame.clone();
             
             if (frame.empty()) break; 
@@ -77,7 +90,15 @@ void invert_p(VideoCapture inputVideo, VideoWriter outputVideo){
     
                }
             }
-           outputVideo.write(frame);
+           newframes_temp[i]=frame;
+        }
+        for(int i=0;i<NUMFRAMES; i++) 
+            {
+            Mat frame=newframes_temp[i];
+            if (frame.empty()) break; 
+
+            outputVideo.write(frame);
+            
         }
 }
 
@@ -530,7 +551,8 @@ int main(int argc, char *argv[])
 
     Size S = Size((int) inputVideo.get(CV_CAP_PROP_FRAME_WIDTH),    // Acquire input size
                   (int) inputVideo.get(CV_CAP_PROP_FRAME_HEIGHT));
-
+    
+    int NUMFRAMES=inputVideo.get(CV_CAP_PROP_FRAME_COUNT);
     VideoWriter outputVideo;                                        // Open the output
     outputVideo.open(NAME, ex=0, inputVideo.get(CV_CAP_PROP_FPS), S, true);
     
@@ -548,7 +570,7 @@ int main(int argc, char *argv[])
     	if(processing=="-serial")
         	invert_s(inputVideo, outputVideo);
         else if(processing=="-parallel")
-        	invert_p(inputVideo, outputVideo);
+        	invert_p(inputVideo, outputVideo, NUMFRAMES);
         else{
         	inputVideo.release();
 		    outputVideo.release();
