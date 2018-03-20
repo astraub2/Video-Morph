@@ -25,7 +25,7 @@ static void help()
         << "Usage:"                                                                         << endl
         << "./video-write inputvideoName <command>"                              << endl
         << "------------------------------------------------------------------------------" << endl
-        << "Available commands: invert, bw, sepia, watermark, darken, self_overlay" << endl
+        << "Available commands: invert, bw, watermark, darken, self_overlay" << endl
         << "./video-write inputvideoName <command> <watermark image file name>"                              << endl
 
         << endl;
@@ -195,7 +195,7 @@ int main(int argc, char *argv[])
     	std::cout << "Timer: " << std::chrono::duration_cast<std::chrono::milliseconds>(stop - start).count()
       			  << " milliseconds\n";
 
-	} else if (Command == "sepia"){
+	} /*else if (Command == "sepia"){
 		cout << "Sepia..." << endl;
 
 		auto start = Clock::now();
@@ -246,7 +246,7 @@ int main(int argc, char *argv[])
 		auto stop = Clock::now();
     	std::cout << "Timer: " << std::chrono::duration_cast<std::chrono::milliseconds>(stop - start).count()
       			  << " milliseconds\n";
-
+	*/
     } else if (Command == "watermark") {
 
         cout<<"Adding watermark..."<<endl;

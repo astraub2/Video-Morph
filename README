@@ -1,32 +1,32 @@
-Hey guys, this document is unofficial and for communication purposes
-In this folder is eerything you need to get started.
-First, some dependencies:
-CMake installed
+This purpose of this project is to use OpenCV to distort videos in C++ and then use OpenMP to parallelize the serial code.
 
-Next, you will need openCV on your machine. 
+This program only works on linux. If you do not have linux, a virtual machine running linux is needed. 
 
-If you have linux, your in luck!
-I found  perfect tutorial to get you started:
-    https://milq.github.io/install-opencv-ubuntu-debian/
+The user will need to download openCV. Here is a tutorial: https://milq.github.io/install-opencv-ubuntu-debian/
 Follow these steps to ensure OpenCV is installed correctly.
-I recomend using the demo file on the site, it's very helpful.
+I recommend using the demo file on the site, it's very helpful.
 
-If your on a Mac, please let the team know your installation steps for 
-documentation purposes.
-A warning, I spent almost 6 hours installing openCV on my machine. The
-problem was I had not installed all of the dependency files. Read openCV's
-installation guides thouroughly to ensure you have installed all the right libraries.
+Available commands for the program are:
+invert, self_overlay, darken, watermark, bw, negative, blur
 
-Next, once you have done a demo of openCV and are confident it is running properly,
-please run the following command 
-to generate the build files and run warp_serial:
-    cmake . && make
-PS do this from the 431_parallel_group_project folder
-Finally, run the generated program. It will tell you the syntax information.
+To run the program:
+
+make clean
+make all
+
+//to run serial implementation
+./video-write <video filename> <command> -serial
+
+//to run serial implementation for watermark distortion
+./video-write <video filename> <command> -serial <watermark image file name>
+
+//to run parallel implementation
+./video-write <video filename> <command> -serial
+
+//to run parallel implementation for watermark distortion
+./video-write <video filename> <command> -parallel <watermark image file name>
 
 
-PS I have 15 hours logged trying to get this to run, It might take a while 
-to get started.
 
 
 
