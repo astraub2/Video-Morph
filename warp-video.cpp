@@ -20,14 +20,13 @@ static void help()
 {
     cout
         << "------------------------------------------------------------------------------" << endl
-        << "This program distortes and writes video files utilizing parallel processing."                                   << endl
+        << "This program distortes and writes video files utilizing parallel processing."  << endl
         << "You can extract multiple distortions from the input video."              << endl
         << "Usage:"                                                                         << endl
         << "./video-write inputvideoName <command> <-serial OR -parallel>"                              << endl
         << "------------------------------------------------------------------------------" << endl
-        << "Available commands: invert, self_overlay, darken, watermark, bw, negative, blur
-" << endl
-        << "./video-write inputvideoName <command> <-serial OR -parallel> watermarkimage"                              << endl
+        << "Available commands: invert, self_overlay, darken, watermark, bw, negative, blur" << endl
+        << "./video-write inputvideoName <command> <-serial OR -parallel> watermarkimage" << endl
 
         << endl;
 }
@@ -655,7 +654,6 @@ int main(int argc, char *argv[])
 
     }
     
-
     inputVideo.release();
     outputVideo.release();
     cout << "Finished writing" << endl;
