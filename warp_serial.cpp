@@ -1,6 +1,9 @@
 #include <iostream> // for standard I/O
 #include <string>   // for strings
 
+#include <chrono>	// for time
+typedef std::chrono::high_resolution_clock Clock;
+
 #include <highgui.h>
 #include <opencv2/imgproc/imgproc.hpp>
 
@@ -72,8 +75,9 @@ int main(int argc, char *argv[])
     
 
     if(Command=="invert"){
-
     	cout<<"Inverting...."<<endl;
+
+    	auto start = Clock::now();
     	for(;;) 
         	{
 	        Mat frame;
@@ -93,14 +97,17 @@ int main(int argc, char *argv[])
 	
 	           }
 	        }
-	       outputVideo.write(frame);
+	       	outputVideo.write(frame);
 	    }
+	    auto stop = Clock::now();
+    	std::cout << "Timer: " << std::chrono::duration_cast<std::chrono::milliseconds>(stop - start).count()
+      			  << " milliseconds\n";
     
-    } 
-    
-    else if(Command=="blur"){
+    } else if(Command=="blur"){
 
     	cout<<"Blurry...."<<endl;
+
+    	auto start = Clock::now();
     	Mat frame;
 		Mat copyFrame;
     	for(;;) 
@@ -115,49 +122,59 @@ int main(int argc, char *argv[])
 				GaussianBlur( copyFrame, frame, Size( i, i ), 0, 0 );
 			}
 
-	       outputVideo.write(frame);
+	       	outputVideo.write(frame);
 	    }
+	    auto stop = Clock::now();
+    	std::cout << "Timer: " << std::chrono::duration_cast<std::chrono::milliseconds>(stop - start).count()
+      			  << " milliseconds\n";
 
    } else if (Command == "bw"){
-	cout << "Black and Whiting..." << endl;
-	Mat frame;
-	Mat copyFrame;
-	uchar pixValue;
-	float rconst = 0.2125;
-	float gconst = 0.7154;
-	float bconst = 0.0721;
-	char luminosity;
+		cout << "Black and Whiting..." << endl;
 
-	for(;;){
-		inputVideo >> frame;
-		copyFrame = frame;
-		if(frame.empty()) break;
-		for (int i = 0; i < frame.rows; i++) {
+		auto start = Clock::now();
+		Mat frame;
+		Mat copyFrame;
+		uchar pixValue;
+		float rconst = 0.2125;
+		float gconst = 0.7154;
+		float bconst = 0.0721;
+		char luminosity;
+
+		for(;;){
+			inputVideo >> frame;
+			copyFrame = frame;
+			if(frame.empty()) break;
+			for (int i = 0; i < frame.rows; i++) {
 	        	for (int j = 0; j < frame.cols; j++) {
-        	    		Vec3b &inputPixel = frame.at<Vec3b>(i, j);
-	        	        Vec3b &outputPixel = copyFrame.at<Vec3b>(i, j);
+    	    		Vec3b &inputPixel = frame.at<Vec3b>(i, j);
+        	        Vec3b &outputPixel = copyFrame.at<Vec3b>(i, j);
 	                
     				//Create luminosity value
 	    			luminosity = (rconst * inputPixel.val[0] + gconst * inputPixel.val[1] + bconst * inputPixel.val[2]);
-				outputPixel.val[0] = luminosity;
-				outputPixel.val[1] = luminosity;
-				outputPixel.val[2] = luminosity;
-            		}
-		}	
+					outputPixel.val[0] = luminosity;
+					outputPixel.val[1] = luminosity;
+					outputPixel.val[2] = luminosity;
+        		}
+			}	
 	        outputVideo.write(copyFrame);
-	}
+		}
+		auto stop = Clock::now();
+    	std::cout << "Timer: " << std::chrono::duration_cast<std::chrono::milliseconds>(stop - start).count()
+      			  << " milliseconds\n";
 
-   } else if (Command == "negative"){
-	cout << "Negative..." << endl;
-	Mat frame;
-	Mat copyFrame;
-	uchar pixValue;
+   	} else if (Command == "negative"){
+		cout << "Negative..." << endl;
 
-	for(;;){
-		inputVideo >> frame;
-		copyFrame = frame;
-		if(frame.empty()) break;
-		for (int i = 0; i < frame.rows; i++) {
+		auto start = Clock::now();
+		Mat frame;
+		Mat copyFrame;
+		uchar pixValue;
+
+		for(;;){
+			inputVideo >> frame;
+			copyFrame = frame;
+			if(frame.empty()) break;
+			for (int i = 0; i < frame.rows; i++) {
 	        	for (int j = 0; j < frame.cols; j++) {
     	    		Vec3b &inputPixel = frame.at<Vec3b>(i, j);
         	        Vec3b &outputPixel = copyFrame.at<Vec3b>(i, j);
@@ -166,59 +183,71 @@ int main(int argc, char *argv[])
 					outputPixel.val[1] = 255 - inputPixel.val[1];
 					outputPixel.val[2] = 255 - inputPixel.val[2];
             	}
-		}	
-	        outputVideo.write(copyFrame);
-	}
+			}	
+	        outputVideo.write(copyFrame);	      
+		}
+		auto stop = Clock::now();
+    	std::cout << "Timer: " << std::chrono::duration_cast<std::chrono::milliseconds>(stop - start).count()
+      			  << " milliseconds\n";
 
 	} else if (Command == "sepia"){
-	cout << "Sepia..." << endl;
-	Mat frame;
-	Mat copyFrame;
-	uchar pixValue;
+		cout << "Sepia..." << endl;
 
-	int tr;
-	int tg;
-	int tb;
-	int r;
-	int g;
-	int b;
+		auto start = Clock::now();
 
-	for(;;){
-		inputVideo >> frame;
-		copyFrame = frame;
-		if(frame.empty()) break;
-		for (int i = 0; i < frame.rows; i++) {
+		Mat frame;
+		Mat copyFrame;
+		uchar pixValue;
+
+		int tr;
+		int tg;
+		int tb;
+		int r;
+		int g;
+		int b;
+
+		for(;;){
+			inputVideo >> frame;
+			copyFrame = frame;
+			if(frame.empty()) break;
+			for (int i = 0; i < frame.rows; i++) {
 	        	for (int j = 0; j < frame.cols; j++) {
-        	    		Vec3b &in = frame.at<Vec3b>(i, j);
-	        	        Vec3b &out = copyFrame.at<Vec3b>(i, j);
-	                
+    	    		Vec3b &in = frame.at<Vec3b>(i, j);
+        	        Vec3b &out = copyFrame.at<Vec3b>(i, j);
+                
     				//Create sepia values
-				tr = (int) (0.299 * in.val[0]) +
-				     	   (0.587 * in.val[1]) +
-				     	   (0.114 * in.val[2]);
-				tg = (int) (0.299 * in.val[0]) +
-				       	   (0.587 * in.val[1]) +
-				     	   (0.114 * in.val[2]);
-				tb = (int) (0.299 * in.val[0]) +
-				           (0.587 * in.val[1]) +
-				    	   (0.114 * in.val[2]);
+					tr = (int) (0.299 * in.val[0]) +
+					     	   (0.587 * in.val[1]) +
+					     	   (0.114 * in.val[2]);
+					tg = (int) (0.299 * in.val[0]) +
+					       	   (0.587 * in.val[1]) +
+					     	   (0.114 * in.val[2]);
+					tb = (int) (0.299 * in.val[0]) +
+					           (0.587 * in.val[1]) +
+					    	   (0.114 * in.val[2]);
 
-				// If they are over max value, set to max
-				if(tr > 255){ r = 255; } else { r = tr; }	
-				if(tg > 255){ g = 255; } else { g = tg; }	
-				if(tb > 255){ b = 255; } else { b = tb; }	
+					// If they are over max value, set to max
+					if(tr > 255){ r = 255; } else { r = tr; }	
+					if(tg > 255){ g = 255; } else { g = tg; }	
+					if(tb > 255){ b = 255; } else { b = tb; }	
 
-				out.val[0] = r;
-				out.val[1] = g;
-				out.val[2] = b;
-            		}
-		}	
+					out.val[0] = r;
+					out.val[1] = g;
+					out.val[2] = b;
+            	}
+			}	
 	        outputVideo.write(copyFrame);
-	}
+		}
+		auto stop = Clock::now();
+    	std::cout << "Timer: " << std::chrono::duration_cast<std::chrono::milliseconds>(stop - start).count()
+      			  << " milliseconds\n";
 
     } else if (Command == "watermark") {
 
         cout<<"Adding watermark..."<<endl;
+
+        auto start = Clock::now();
+
         Mat wframe = imread(watermark_img_file);
         double opacity = .25;
         int offset = 100;
@@ -235,15 +264,19 @@ int main(int argc, char *argv[])
                     intensity.val[0] = watermark.val[0]*opacity + intensity.val[0]*(1-opacity);
                     intensity.val[1] = watermark.val[1]*opacity + intensity.val[1]*(1-opacity);
                     intensity.val[2] = watermark.val[2]*opacity + intensity.val[2]*(1-opacity);
-        
                 }
             }
-           outputVideo.write(frame);
+            outputVideo.write(frame);
         }
-    }
-    else if(Command=="darken"){
+        auto stop = Clock::now();
+    	std::cout << "Timer: " << std::chrono::duration_cast<std::chrono::milliseconds>(stop - start).count()
+      			  << " milliseconds\n";
+
+    } else if(Command=="darken"){
 
         cout<<"Darkening...."<<endl;
+
+        auto start = Clock::now();
         for(;;) 
             {
             Mat frame;
@@ -258,16 +291,20 @@ int main(int argc, char *argv[])
                     Vec3b &inverse = cframe.at<Vec3b>(j, i);
                     intensity.val[0] = inverse.val[0]>>1;
                     intensity.val[1] = inverse.val[1]>>1;
-                    intensity.val[2] = inverse.val[2]>>1;
-    
+                    intensity.val[2] = inverse.val[2]>>1;   
                 }
             }
-           outputVideo.write(frame);
+	    	outputVideo.write(frame);
         }
-    }
-    else if(Command=="self_overlay"){
+        auto stop = Clock::now();
+    	std::cout << "Timer: " << std::chrono::duration_cast<std::chrono::milliseconds>(stop - start).count()
+      			  << " milliseconds\n";
+
+    } else if(Command=="self_overlay"){
 
         cout<<"Overlaying...."<<endl;
+
+        auto start = Clock::now();
         for(;;) 
             {
             Mat frame;
@@ -282,8 +319,7 @@ int main(int argc, char *argv[])
                     Vec3b &inverse = cframe.at<Vec3b>(cframe.rows-j, cframe.cols-i);
                     intensity.val[0] = inverse.val[0];
                     intensity.val[1] = inverse.val[1];
-                    intensity.val[2] = inverse.val[2];
-    
+                    intensity.val[2] = inverse.val[2];   
                 }
             }
             for (int i = 1; i < cframe.cols; i+=2) {
@@ -292,99 +328,107 @@ int main(int argc, char *argv[])
                     Vec3b &inverse = cframe.at<Vec3b>(cframe.rows-j, cframe.cols-i);
                     intensity.val[0] = inverse.val[0];
                     intensity.val[1] = inverse.val[1];
-                    intensity.val[2] = inverse.val[2];
-    
+                    intensity.val[2] = inverse.val[2];   
                 }
             }
             
-           outputVideo.write(frame);
+        	outputVideo.write(frame);
         }
-    }
-    else if(Command == "andy"){
+        auto stop = Clock::now();
+    	std::cout << "Timer: " << std::chrono::duration_cast<std::chrono::milliseconds>(stop - start).count()
+      			  << " milliseconds\n";
+
+    } else if(Command == "andy"){
     
         cout << "Making art...." << endl;
-	for(;;){
-        Mat frame;
-	inputVideo >> frame;
-	if (frame.empty()) break;
+
+        auto start = Clock::now();
+		for(;;){
+        	Mat frame;
+			inputVideo >> frame;
+			if (frame.empty()) break;
 
 
-        Mat cframe(frame.rows, frame.cols, frame.type());
+        	Mat cframe(frame.rows, frame.cols, frame.type());
         
-	Mat newframe(frame.rows, frame.cols, frame.type()); //new frame same size as original
-        int halfrow = frame.rows/2;
-	int halfcol = frame.cols/2; 
-        Mat q1(halfrow, halfcol, frame.type());
-        Mat q2(halfrow, halfcol, frame.type());
-        Mat q3(halfrow, halfcol, frame.type());
-        Mat q4(halfrow, halfcol, frame.type());
+			Mat newframe(frame.rows, frame.cols, frame.type()); //new frame same size as original
+        	int halfrow = frame.rows/2;
+			int halfcol = frame.cols/2; 
+	        Mat q1(halfrow, halfcol, frame.type());
+	        Mat q2(halfrow, halfcol, frame.type());
+	        Mat q3(halfrow, halfcol, frame.type());
+	        Mat q4(halfrow, halfcol, frame.type());
 
-	resize(frame, q1, q1.size(), 0, 0, INTER_AREA);
-	resize(frame, q2, q2.size(), 0, 0, INTER_AREA);
-	resize(frame, q3, q3.size(), 0, 0, INTER_AREA);
-	resize(frame, q4, q4.size(), 0, 0, INTER_AREA);
- 	
-	int offset = 32;	
+			resize(frame, q1, q1.size(), 0, 0, INTER_AREA);
+			resize(frame, q2, q2.size(), 0, 0, INTER_AREA);
+			resize(frame, q3, q3.size(), 0, 0, INTER_AREA);
+			resize(frame, q4, q4.size(), 0, 0, INTER_AREA);
+		 	
+			int offset = 32;	
 
-        for(int i = 0; i < q1.rows; i++){
-	    for(int j = 0; j < q1.cols; j++){	
-		Vec3b &q1color = q1.at<Vec3b>(j,i);
-		Vec3b &q2color = q2.at<Vec3b>(j,i);
-		Vec3b &q3color = q3.at<Vec3b>(j,i);
-		Vec3b &q4color = q4.at<Vec3b>(j,i);
+	        for(int i = 0; i < q1.rows; i++){
+			    for(int j = 0; j < q1.cols; j++){	
+					Vec3b &q1color = q1.at<Vec3b>(j,i);
+					Vec3b &q2color = q2.at<Vec3b>(j,i);
+					Vec3b &q3color = q3.at<Vec3b>(j,i);
+					Vec3b &q4color = q4.at<Vec3b>(j,i);
 
-		q1color.val[0] += offset;
-		q1color.val[1] += offset;
-		q1color.val[2] += offset;
-		q2color.val[0] += (offset*2);
-		q2color.val[1] += (offset*2);
-		q2color.val[2] += (offset*2);
-		q3color.val[0] += (offset*3);
-		q3color.val[1] += (offset*3);
-		q3color.val[2] += (offset*3);
-		q4color.val[0] += (offset*4);
-		q4color.val[1] += (offset*4);
-		q4color.val[2] += (offset*4);
-	    }
-	}
-	for(int i = 0; i < q1.rows-1; i++){
-	    for(int j = 0; j < q1.cols-1; j++){
-		Vec3b &newframecolor = newframe.at<Vec3b>(j,i);
-		Vec3b &q1color = q1.at<Vec3b>(j, i);
-		newframecolor.val[0] = q1color.val[0];
-		newframecolor.val[1] = q1color.val[1];
-		newframecolor.val[2] = q1color.val[2];
-	    }
-	}
-	for(int i = halfrow; i < frame.rows-1; i++){
-	    for(int j = 0; j < q2.cols-1; j++){
-		Vec3b &newframecolor = newframe.at<Vec3b>(j,i);
-		Vec3b &q2color = q2.at<Vec3b>(j, i);
-		newframecolor.val[0] = q2color.val[0];
-		newframecolor.val[1] = q2color.val[1];
-		newframecolor.val[2] = q2color.val[2];
-	    }
-	}
-	for(int i = 0; i < q3.rows-1; i++){
-	    for(int j = halfcol; j < frame.cols-1; j++){
-		Vec3b &newframecolor = newframe.at<Vec3b>(j,i);
-		Vec3b &q3color = q3.at<Vec3b>(j, i);
-		newframecolor.val[0] = q3color.val[0];
-		newframecolor.val[1] = q3color.val[1];
-		newframecolor.val[2] = q3color.val[2];
-	    }
-	}
-	for(int i = halfrow; i < frame.rows-1; i++){
-	    for(int j = halfcol; j < frame.cols-1; j++){
-		Vec3b &newframecolor = newframe.at<Vec3b>(j,i);
-		Vec3b &q4color = q4.at<Vec3b>(j, i);
-		newframecolor.val[0] = q4color.val[0];
-		newframecolor.val[1] = q4color.val[1];
-		newframecolor.val[2] = q4color.val[2];
-	    }
-	}
-	outputVideo.write(frame);
-    }
+					q1color.val[0] += offset;
+					q1color.val[1] += offset;
+					q1color.val[2] += offset;
+					q2color.val[0] += (offset*2);
+					q2color.val[1] += (offset*2);
+					q2color.val[2] += (offset*2);
+					q3color.val[0] += (offset*3);
+					q3color.val[1] += (offset*3);
+					q3color.val[2] += (offset*3);
+					q4color.val[0] += (offset*4);
+					q4color.val[1] += (offset*4);
+					q4color.val[2] += (offset*4);
+		    	}
+			}
+			for(int i = 0; i < q1.rows-1; i++){
+		    	for(int j = 0; j < q1.cols-1; j++){
+					Vec3b &newframecolor = newframe.at<Vec3b>(j,i);
+					Vec3b &q1color = q1.at<Vec3b>(j, i);
+					newframecolor.val[0] = q1color.val[0];
+					newframecolor.val[1] = q1color.val[1];
+					newframecolor.val[2] = q1color.val[2];
+		    	}
+			}
+			for(int i = halfrow; i < frame.rows-1; i++){
+			    for(int j = 0; j < q2.cols-1; j++){
+					Vec3b &newframecolor = newframe.at<Vec3b>(j,i);
+					Vec3b &q2color = q2.at<Vec3b>(j, i);
+					newframecolor.val[0] = q2color.val[0];
+					newframecolor.val[1] = q2color.val[1];
+					newframecolor.val[2] = q2color.val[2];
+				}
+			}
+			for(int i = 0; i < q3.rows-1; i++){
+			    for(int j = halfcol; j < frame.cols-1; j++){
+					Vec3b &newframecolor = newframe.at<Vec3b>(j,i);
+					Vec3b &q3color = q3.at<Vec3b>(j, i);
+					newframecolor.val[0] = q3color.val[0];
+					newframecolor.val[1] = q3color.val[1];
+					newframecolor.val[2] = q3color.val[2];
+			    }
+			}
+			for(int i = halfrow; i < frame.rows-1; i++){
+			    for(int j = halfcol; j < frame.cols-1; j++){
+					Vec3b &newframecolor = newframe.at<Vec3b>(j,i);
+					Vec3b &q4color = q4.at<Vec3b>(j, i);
+					newframecolor.val[0] = q4color.val[0];
+					newframecolor.val[1] = q4color.val[1];
+					newframecolor.val[2] = q4color.val[2];
+			    }
+			}
+			outputVideo.write(frame);
+    	}
+    	auto stop = Clock::now();
+    	std::cout << "Timer: " << std::chrono::duration_cast<std::chrono::milliseconds>(stop - start).count()
+      			  << " milliseconds\n";
+
     }	
 
     inputVideo.release();

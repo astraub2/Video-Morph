@@ -1,6 +1,9 @@
 #include <iostream> // for standard I/O
 #include <string>   // for strings
 
+#include <chrono>	// for time
+typedef std::chrono::high_resolution_clock Clock;
+
 #include <highgui.h>
 #include <opencv2/imgproc/imgproc.hpp>
 
@@ -71,9 +74,12 @@ int main(int argc, char *argv[])
          << " of nr#: " << inputVideo.get(CV_CAP_PROP_FRAME_COUNT) << endl;
     
 
-    if(Command=="invert"){
+    if(Command == "invert"){
 
     	cout<<"Inverting...."<<endl;
+
+    	auto start = Clock::now();
+
     	for(;;) 
         	{
 	        Mat frame;
@@ -84,21 +90,25 @@ int main(int argc, char *argv[])
 
 	        uchar pixValue;
 	        for (int i = 0; i < cframe.cols; i++) {
-            for (int j = 0; j < cframe.rows; j++) {
+            	for (int j = 0; j < cframe.rows; j++) {
 	                Vec3b &intensity = frame.at<Vec3b>(j, i);
 	                Vec3b &inverse = cframe.at<Vec3b>(cframe.rows-j, cframe.cols-i);
 	                intensity.val[0] = inverse.val[0];
 	                intensity.val[1] = inverse.val[1];
-	                intensity.val[2] = inverse.val[2];
-	
-	             }
+	                intensity.val[2] = inverse.val[2];	
+	            }
 	        }
-	       outputVideo.write(frame);
+	       	outputVideo.write(frame);
 	    }
+	    auto stop = Clock::now();
+    	std::cout << "Timer: " << std::chrono::duration_cast<std::chrono::milliseconds>(stop - start).count()
+      			  << " milliseconds\n";
     
-    } if(Command=="blur"){
+    } else if(Command == "blur"){
 
     	cout<<"Blurry...."<<endl;
+
+    	auto start = Clock::now();
     	for(;;) 
         	{
 	        Mat frame;
@@ -109,47 +119,58 @@ int main(int argc, char *argv[])
 
 	        uchar pixValue;
 	        for (int i = 0; i < cframe.cols; i=i+2) {
-            		for (int j = 0; j < cframe.rows; j=j+2) {
-				GaussianBlur(cframe, frame, Size(i,j), 0, 0);	
-	             }
+            	for (int j = 0; j < cframe.rows; j=j+2) {
+					GaussianBlur(cframe, frame, Size(i,j), 0, 0);	
+	            }
 	        }
-	       outputVideo.write(frame);
+	       	outputVideo.write(frame);
 	    }
+	    auto stop = Clock::now();
+    	std::cout << "Timer: " << std::chrono::duration_cast<std::chrono::milliseconds>(stop - start).count()
+      			  << " milliseconds\n";
 
    } else if (Command == "bw"){
-	cout << "Black and Whiting..." << endl;
+		cout << "Black and Whiting..." << endl;
 
-	Mat frame;
-	Mat cframe;
+		auto start = Clock::now();
+		Mat frame;
+		Mat cframe;
 
-	uchar pixValue;
-	float rconst = 0.2125;
-	float gconst = 0.7154;
-	float bconst = 0.0721;
+		uchar pixValue;
+		float rconst = 0.2125;
+		float gconst = 0.7154;
+		float bconst = 0.0721;
 
-	for(;;){
-		inputVideo >> frame;
-		inputVideo >> cframe;
-		if(frame.empty()) break;
+		for(;;){
+			inputVideo >> frame;
+			inputVideo >> cframe;
+			if(frame.empty()) break;
 
-		for (int i = 0; i < cframe.cols; i++) {
-  	        	for (int j = 0; j < cframe.rows; j++) {
+			for (int i = 0; i < cframe.cols; i++) {
+	  	        	for (int j = 0; j < cframe.rows; j++) {
 
-				Vec3b &outframe = frame.at<Vec3b>(i, j);
-                		Vec3b &inframe = cframe.at<Vec3b>(i, j);
+					Vec3b &outframe = frame.at<Vec3b>(i, j);
+	                		Vec3b &inframe = cframe.at<Vec3b>(i, j);
 
-				// Change each color value to black and white	
-				outframe.val[0] = (int)(rconst * inframe.val[0]);
-				outframe.val[1] = (int)(rconst * inframe.val[1]);
-				outframe.val[2] = (int)(rconst * inframe.val[2]);
+					// Change each color value to black and white	
+					outframe.val[0] = (int)(rconst * inframe.val[0]);
+					outframe.val[1] = (int)(rconst * inframe.val[1]);
+					outframe.val[2] = (int)(rconst * inframe.val[2]);
+				}
 			}
-		}	
-	       outputVideo.write(frame);
-	}
+	        
+	        outputVideo.write(frame);
+		}
+
+		auto stop = Clock::now();
+    	std::cout << "Timer: " << std::chrono::duration_cast<std::chrono::milliseconds>(stop - start).count()
+      			  << " milliseconds\n";
 
     } else if (Command == "watermark") {
 
-        cout<<"Adding watermark..."<<endl;
+        cout << "Adding watermark..." << endl;
+
+        auto start = Clock::now();
         Mat wframe = imread(watermark_img_file);
         double opacity = .25;
         int offset = 100;
@@ -165,16 +186,20 @@ int main(int argc, char *argv[])
                     Vec3b &watermark = wframe.at<Vec3b>(i, j);
                     intensity.val[0] = watermark.val[0]*opacity + intensity.val[0]*(1-opacity);
                     intensity.val[1] = watermark.val[1]*opacity + intensity.val[1]*(1-opacity);
-                    intensity.val[2] = watermark.val[2]*opacity + intensity.val[2]*(1-opacity);
-        
+                    intensity.val[2] = watermark.val[2]*opacity + intensity.val[2]*(1-opacity);    
                 }
-            }
-           outputVideo.write(frame);
+            }          	
+           	outputVideo.write(frame);
         }
-    }
-    if(Command=="darken"){
+        auto stop = Clock::now();
+    	std::cout << "Timer: " << std::chrono::duration_cast<std::chrono::milliseconds>(stop - start).count()
+      			  << " milliseconds\n";
 
-        cout<<"Darkening...."<<endl;
+    } else if(Command == "darken"){
+
+        cout << "Darkening...." << endl;
+
+        auto start = Clock::now();
         #pragma omp parallel for
         for(;;) 
             {
@@ -195,12 +220,18 @@ int main(int argc, char *argv[])
     
                  }
             }
-           outputVideo.write(frame);
+           
+           	outputVideo.write(frame);
         }
-    }
-    if(Command=="self_overlay"){
+        auto stop = Clock::now();
+    	std::cout << "Timer: " << std::chrono::duration_cast<std::chrono::milliseconds>(stop - start).count()
+      			  << " milliseconds\n";
 
-        cout<<"Overlaying...."<<endl;
+    } else if(Command == "self_overlay"){
+
+        cout << "Overlaying...." << endl;
+
+        auto start = Clock::now();
         #pragma omp parallel for
         for(;;) 
             {
@@ -212,8 +243,8 @@ int main(int argc, char *argv[])
 
             #pragma omp parallel for
             for (int i = 0; i < cframe.cols; i+=2) {
-            for (int j = 0; j < cframe.rows; j+=2) {
-                  Vec3b &intensity = frame.at<Vec3b>(j, i);
+            	for (int j = 0; j < cframe.rows; j+=2) {
+                	Vec3b &intensity = frame.at<Vec3b>(j, i);
                     Vec3b &inverse = cframe.at<Vec3b>(cframe.rows-j, cframe.cols-i);
                     intensity.val[0] = inverse.val[0];
                     intensity.val[1] = inverse.val[1];
@@ -223,8 +254,8 @@ int main(int argc, char *argv[])
             }
             #pragma omp parallel for
             for (int i = 1; i < cframe.cols; i+=2) {
-            for (int j = 1; j < cframe.rows; j+=2) {
-                  Vec3b &intensity = frame.at<Vec3b>(j, i);
+            	for (int j = 1; j < cframe.rows; j+=2) {
+                	Vec3b &intensity = frame.at<Vec3b>(j, i);
                     Vec3b &inverse = cframe.at<Vec3b>(cframe.rows-j, cframe.cols-i);
                     intensity.val[0] = inverse.val[0];
                     intensity.val[1] = inverse.val[1];
@@ -232,9 +263,13 @@ int main(int argc, char *argv[])
     
                  }
             }
-            
-           outputVideo.write(frame);
+           	
+           	outputVideo.write(frame);
         }
+        auto stop = Clock::now();
+    	std::cout << "Timer: " << std::chrono::duration_cast<std::chrono::milliseconds>(stop - start).count()
+      			  << " milliseconds\n";
+
     }
 
     inputVideo.release();
