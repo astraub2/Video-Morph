@@ -561,8 +561,14 @@ int main(int argc, char *argv[])
     cout << "Input frame resolution: Width=" << S.width << "  Height=" << S.height
          << " of nr#: " << inputVideo.get(CV_CAP_PROP_FRAME_COUNT) << endl;
     
-    
-         //sepia
+    //watermark error message
+    if(Command=="watermark"){
+        if(argc < 5) {
+            cout  << "Not enough parameters. Don't forget image file name!" << endl;
+            return -1;
+        }
+    }
+
     if(processing=="-serial"){
         auto t1 = Clock::now();
         if(Command=="invert")
