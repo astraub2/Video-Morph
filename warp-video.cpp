@@ -23,7 +23,7 @@ static void help()
         << "This program distortes and writes video files utilizing parallel processing."  << endl
         << "You can extract multiple distortions from the input video."              << endl
         << "Usage:"                                                                         << endl
-        << "./video-write inputvideoName <command> <-serial OR -parallel>"                              << endl
+        << "./video-write inputvideoName <command> <-serial OR -parallel>" << endl
         << "------------------------------------------------------------------------------" << endl
         << "Available commands: invert, self_overlay, darken, watermark, bw, negative, blur" << endl
         << "./video-write inputvideoName <command> <-serial OR -parallel> watermarkimage" << endl
@@ -113,8 +113,9 @@ void self_overlay_s(VideoCapture inputVideo, VideoWriter outputVideo){
 }
 void self_overlay_p(Mat* frames_temp, Mat* newframes_temp, int NUMFRAMES){
      cout<<"Overlaying...."<<endl;
-     	#pragma omp parallel for
+
         for(int i=0;i<NUMFRAMES; i++) 
+            #pragma omp parallel for
             {
             Mat frame=frames_temp[i];
             Mat cframe=frame.clone();
@@ -164,9 +165,8 @@ void darken_s(VideoCapture inputVideo, VideoWriter outputVideo){
 void darken_p(Mat* frames_temp, Mat* newframes_temp, int NUMFRAMES){
     
     cout<<"Darkening...."<<endl;
-    #pragma omp parallel for
         for(int i=0;i<NUMFRAMES; i++) 
-      
+            #pragma omp parallel for
             {
             Mat frame=frames_temp[i];
             Mat cframe=frame.clone();
@@ -220,8 +220,9 @@ void watermark_p(Mat* frames_temp, Mat* newframes_temp, int NUMFRAMES, string& w
         Mat wframe = imread(watermark_img_file);
         double opacity = .25;
         int offset = 100;
-        #pragma omp parallel for
+        
         for(int i=0;i<NUMFRAMES; i++) 
+            #pragma omp parallel for
             {
             Mat frame=frames_temp[i];
             int chunk_size = frame.cols/4;
@@ -281,8 +282,9 @@ void bw_p(Mat* frames_temp, Mat* newframes_temp, int NUMFRAMES) {
     float gconst = 0.7154;
     float bconst = 0.0721;
     char luminosity;
-    #pragma omp parallel for
+
     for(int i=0;i<NUMFRAMES; i++) 
+        #pragma omp parallel for
         {
         Mat frame=frames_temp[i];
         Mat copyFrame=frame.clone();
@@ -334,10 +336,9 @@ void negative_s(VideoCapture inputVideo, VideoWriter outputVideo) {
 }
 
 void negative_p(Mat* frames_temp, Mat* newframes_temp, int NUMFRAMES) {
-	cout << "Negative..." << endl;
 
-	#pragma omp parallel for
     for(int i=0;i<NUMFRAMES; i++) 
+        #pragma omp parallel for
         {
         Mat frame=frames_temp[i];
         Mat copyFrame=frame.clone();
@@ -494,8 +495,8 @@ void blur_p(Mat* frames_temp, Mat* newframes_temp, int NUMFRAMES) {
         
         int kernel = 31;
         int chunk_size = kernel/4;
-        #pragma omp parallel for
         for(int i=0;i<NUMFRAMES; i++) 
+            #pragma omp parallel for
             {
             Mat frame=frames_temp[i];
             Mat copyFrame=frame.clone();
@@ -653,7 +654,7 @@ int main(int argc, char *argv[])
         
 
     }
-    
+
     inputVideo.release();
     outputVideo.release();
     cout << "Finished writing" << endl;
