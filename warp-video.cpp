@@ -306,7 +306,7 @@ void bw_p(Mat* frames_temp, Mat* newframes_temp, int NUMFRAMES) {
                 outputPixel.val[2] = luminosity;
                     }
         }   
-            newframes_temp[i]=frame;
+            newframes_temp[i]=copyFrame;
     }
 }
 
@@ -579,6 +579,8 @@ int main(int argc, char *argv[])
             negative_s(inputVideo, outputVideo);
         else if(Command=="sepia")
             sepia_s(inputVideo, outputVideo);
+        else if(Command=="blur")
+            blur_s(inputVideo, outputVideo);
         else{
             inputVideo.release();
             outputVideo.release();
@@ -626,6 +628,9 @@ int main(int argc, char *argv[])
         }
         else if(Command=="sepia"){
             sepia_p(frames_temp, newframes_temp, NUMFRAMES);    
+        }
+        else if(Command=="blur"){
+            blur_p(frames_temp, newframes_temp, NUMFRAMES);    
         }
         else{
             inputVideo.release();
