@@ -221,9 +221,8 @@ void watermark_p(Mat* frames_temp, Mat* newframes_temp, int NUMFRAMES, string& w
         Mat wframe = imread(watermark_img_file);
         double opacity = .25;
         int offset = 100;
-        
+        #pragma omp parallel for
         for(int i=0;i<NUMFRAMES; i++) 
-            #pragma omp parallel for
             {
             Mat frame=frames_temp[i];
             int chunk_size = frame.cols/4;
@@ -283,9 +282,8 @@ void bw_p(Mat* frames_temp, Mat* newframes_temp, int NUMFRAMES) {
     float gconst = 0.7154;
     float bconst = 0.0721;
     char luminosity;
-
+    #pragma omp parallel for
     for(int i=0;i<NUMFRAMES; i++) 
-        #pragma omp parallel for
         {
         Mat frame=frames_temp[i];
         Mat copyFrame=frame.clone();
@@ -337,9 +335,10 @@ void negative_s(VideoCapture inputVideo, VideoWriter outputVideo) {
 }
 
 void negative_p(Mat* frames_temp, Mat* newframes_temp, int NUMFRAMES) {
+	cout << "Negative..." << endl;
 
+	#pragma omp parallel for
     for(int i=0;i<NUMFRAMES; i++) 
-        #pragma omp parallel for
         {
         Mat frame=frames_temp[i];
         Mat copyFrame=frame.clone();
@@ -496,8 +495,8 @@ void blur_p(Mat* frames_temp, Mat* newframes_temp, int NUMFRAMES) {
         
         int kernel = 31;
         int chunk_size = kernel/4;
+        #pragma omp parallel for
         for(int i=0;i<NUMFRAMES; i++) 
-            #pragma omp parallel for
             {
             Mat frame=frames_temp[i];
             Mat copyFrame=frame.clone();
