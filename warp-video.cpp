@@ -25,8 +25,7 @@ static void help()
         << "Usage:"                                                                         << endl
         << "./video-write inputvideoName <command> <-serial OR -parallel>"                              << endl
         << "------------------------------------------------------------------------------" << endl
-        << "Available commands: invert, self_overlay, darken, watermark, bw, negative, blur
-" << endl
+        << "Available commands: invert, bw, sepia, watermark, darken, self_overlay" << endl
         << "./video-write inputvideoName <command> <-serial OR -parallel> watermarkimage"                              << endl
 
         << endl;
@@ -465,7 +464,6 @@ void sepia_p(Mat* frames_temp, Mat* newframes_temp, int NUMFRAMES) {
 void blur_s(VideoCapture inputVideo, VideoWriter outputVideo) {
     cout<<"Blurry...."<<endl;
 
-        auto start = Clock::now();
         Mat frame;
         Mat copyFrame;
         for(;;) 
@@ -482,17 +480,13 @@ void blur_s(VideoCapture inputVideo, VideoWriter outputVideo) {
 
             outputVideo.write(frame);
         }
-        auto stop = Clock::now();
-        std::cout << "Timer: " << std::chrono::duration_cast<std::chrono::milliseconds>(stop - start).count()
-                  << " milliseconds\n";
+        
 }
 
 void blur_p(Mat* frames_temp, Mat* newframes_temp, int NUMFRAMES) {
 
     cout<<"Blurry...."<<endl;
 
-        auto start = Clock::now();
-        
         int kernel = 31;
         int chunk_size = kernel/4;
         #pragma omp parallel for
@@ -510,9 +504,7 @@ void blur_p(Mat* frames_temp, Mat* newframes_temp, int NUMFRAMES) {
 
             newframes_temp[i]=frame;
         }
-        auto stop = Clock::now();
-        std::cout << "Timer: " << std::chrono::duration_cast<std::chrono::milliseconds>(stop - start).count()
-                  << " milliseconds\n";
+        
 }
 
 int main(int argc, char *argv[])
