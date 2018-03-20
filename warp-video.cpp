@@ -56,17 +56,7 @@ void invert_s(VideoCapture inputVideo, VideoWriter outputVideo){
            outputVideo.write(frame);
         }
 }
-void invert_p(VideoCapture inputVideo, VideoWriter outputVideo, int NUMFRAMES){
-		Mat frames_temp[NUMFRAMES];
-		Mat newframes_temp[NUMFRAMES];
-		
-		for(int i=0;i<NUMFRAMES; i++) 
-            {
-            Mat frame;
-            inputVideo >> frame; // get a new frame from camera
-            if (frame.empty()) break; 
-            frames_temp[i]=frame;
-        }
+void invert_p(Mat* frames_temp, Mat* newframes_temp, int NUMFRAMES){
 
         cout<<"Inverting...."<<endl;
         #pragma omp parallel for
@@ -93,14 +83,7 @@ void invert_p(VideoCapture inputVideo, VideoWriter outputVideo, int NUMFRAMES){
             }
            newframes_temp[i]=frame;
         }
-        for(int i=0;i<NUMFRAMES; i++) 
-            {
-            Mat frame=newframes_temp[i];
-            if (frame.empty()) break; 
-
-            outputVideo.write(frame);
-            
-        }
+        
 }
 
 void self_overlay_s(VideoCapture inputVideo, VideoWriter outputVideo){
@@ -566,105 +549,139 @@ int main(int argc, char *argv[])
     cout << "Input frame resolution: Width=" << S.width << "  Height=" << S.height
          << " of nr#: " << inputVideo.get(CV_CAP_PROP_FRAME_COUNT) << endl;
     
-    auto t1 = Clock::now();
-    if(Command=="invert"){
-    	if(processing=="-serial")
-        	invert_s(inputVideo, outputVideo);
-        else if(processing=="-parallel")
-        	invert_p(inputVideo, outputVideo, NUMFRAMES);
-        else{
-        	inputVideo.release();
-		    outputVideo.release();
-		    cout << "Bad input, see usage" << endl;
-		    return 0;
-		}
-
     
-    }
-    else if(Command=="self_overlay"){
-    	if(processing=="-serial")
-        	self_overlay_s(inputVideo, outputVideo);
-        else if(processing=="-parallel")
-        	self_overlay_p(inputVideo, outputVideo);
+
+    if(processing=="-serial"){
+    	auto t1 = Clock::now();
+    	if(Command=="invert")
+        	invert_s(inputVideo, outputVideo);
         else{
         	inputVideo.release();
 		    outputVideo.release();
 		    cout << "Bad input, see usage" << endl;
 		    return 0;
 		}
-    }
-      else if(Command=="darken"){
-      	if(processing=="-serial")
-        	darken_s(inputVideo, outputVideo);
-        else if(processing=="-parallel")
-        	darken_p(inputVideo, outputVideo);
-        else{
-        	inputVideo.release();
-		    outputVideo.release();
-		    cout << "Bad input, see usage" << endl;
-		    return 0;
-		}
-    }
-        else if(Command=="watermark"){
-            if(processing=="-serial")
-                watermark_s(inputVideo, outputVideo, watermark_img_file);
-            else if(processing=="-parallel")
-                watermark_p(inputVideo, outputVideo, watermark_img_file);
-            else{
-                inputVideo.release();
-                outputVideo.release();
-                cout << "Bad input, see usage" << endl;
-                return 0;
-        }
-    }
-
-    else if(Command=="bw"){
-            if(processing=="-serial")
-                bw_s(inputVideo, outputVideo);
-            else if(processing=="-parallel")
-                bw_p(inputVideo, outputVideo);
-            else{
-                inputVideo.release();
-                outputVideo.release();
-                cout << "Bad input, see usage" << endl;
-                return 0;
-        }
-    }
-
-    else if(Command=="negative"){
-            if(processing=="-serial")
-                negative_s(inputVideo, outputVideo);
-            else if(processing=="-parallel")
-                negative_p(inputVideo, outputVideo);
-            else{
-                inputVideo.release();
-                outputVideo.release();
-                cout << "Bad input, see usage" << endl;
-                return 0;
-        }
-    }
-    else if(Command=="sepia"){
-            if(processing=="-serial")
-                sepia_s(inputVideo, outputVideo);
-            else if(processing=="-parallel")
-                sepia_p(inputVideo, outputVideo);
-            else{
-                inputVideo.release();
-                outputVideo.release();
-                cout << "Bad input, see usage" << endl;
-                return 0;
-        }
-    }
-    else{
-        	inputVideo.release();
-		    outputVideo.release();
-		    cout << "Bad input, see usage" << endl;
-		    return 0;
-		}
-    auto t2 = Clock::now();
-    std::cout << "Runtime: "
+		auto t2 = Clock::now();
+    std::cout << "Serial Runtime: "
     << std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count()
     << " milliseconds" << std::endl;
+    }
+    if(processing=="-parallel"){
+    	Mat frames_temp[NUMFRAMES];
+		Mat newframes_temp[NUMFRAMES];	
+		for(int i=0;i<NUMFRAMES; i++) 
+            {
+            Mat frame;
+            inputVideo >> frame; // get a new frame from camera
+            if (frame.empty()) break; 
+            frames_temp[i]=frame;
+        }
+        auto t1 = Clock::now();
+    	if(Command=="invert"){
+    		invert_p(frames_temp, newframes_temp, NUMFRAMES);
+    		
+    	}
+    	else{
+        	inputVideo.release();
+		    outputVideo.release();
+		    cout << "Bad input, see usage" << endl;
+		    return 0;
+		}
+    	for(int i=0;i<NUMFRAMES; i++) 
+            {
+            Mat frame=newframes_temp[i];
+            if (frame.empty()) break; 
+
+            outputVideo.write(frame);
+        }
+        auto t2 = Clock::now();
+    std::cout << "Parallel Runtime: "
+    << std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count()
+    << " milliseconds" << std::endl;
+    	
+
+    }
+  //   else if(Command=="self_overlay"){
+  //   	if(processing=="-serial")
+  //       	self_overlay_s(inputVideo, outputVideo);
+  //       else if(processing=="-parallel")
+  //       	self_overlay_p(inputVideo, outputVideo);
+  //       else{
+  //       	inputVideo.release();
+		//     outputVideo.release();
+		//     cout << "Bad input, see usage" << endl;
+		//     return 0;
+		// }
+  //   }
+  //     else if(Command=="darken"){
+  //     	if(processing=="-serial")
+  //       	darken_s(inputVideo, outputVideo);
+  //       else if(processing=="-parallel")
+  //       	darken_p(inputVideo, outputVideo);
+  //       else{
+  //       	inputVideo.release();
+		//     outputVideo.release();
+		//     cout << "Bad input, see usage" << endl;
+		//     return 0;
+		// }
+  //   }
+  //       else if(Command=="watermark"){
+  //           if(processing=="-serial")
+  //               watermark_s(inputVideo, outputVideo, watermark_img_file);
+  //           else if(processing=="-parallel")
+  //               watermark_p(inputVideo, outputVideo, watermark_img_file);
+  //           else{
+  //               inputVideo.release();
+  //               outputVideo.release();
+  //               cout << "Bad input, see usage" << endl;
+  //               return 0;
+  //       }
+  //   }
+
+  //   else if(Command=="bw"){
+  //           if(processing=="-serial")
+  //               bw_s(inputVideo, outputVideo);
+  //           else if(processing=="-parallel")
+  //               bw_p(inputVideo, outputVideo);
+  //           else{
+  //               inputVideo.release();
+  //               outputVideo.release();
+  //               cout << "Bad input, see usage" << endl;
+  //               return 0;
+  //       }
+  //   }
+
+  //   else if(Command=="negative"){
+  //           if(processing=="-serial")
+  //               negative_s(inputVideo, outputVideo);
+  //           else if(processing=="-parallel")
+  //               negative_p(inputVideo, outputVideo);
+  //           else{
+  //               inputVideo.release();
+  //               outputVideo.release();
+  //               cout << "Bad input, see usage" << endl;
+  //               return 0;
+  //       }
+  //   }
+  //   else if(Command=="sepia"){
+  //           if(processing=="-serial")
+  //               sepia_s(inputVideo, outputVideo);
+  //           else if(processing=="-parallel")
+  //               sepia_p(inputVideo, outputVideo);
+  //           else{
+  //               inputVideo.release();
+  //               outputVideo.release();
+  //               cout << "Bad input, see usage" << endl;
+  //               return 0;
+  //       }
+  //   }
+  //   else{
+  //       	inputVideo.release();
+		//     outputVideo.release();
+		//     cout << "Bad input, see usage" << endl;
+		//     return 0;
+		// }
+    
 
     inputVideo.release();
     outputVideo.release();
